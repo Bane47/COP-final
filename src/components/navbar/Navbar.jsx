@@ -8,7 +8,7 @@ function MyNavbar() {
       <nav class="navbar navbar-expand-lg bg-black px-0 py-2 fixed-top ">
         <div class="container">
      
-          <Link className='text-decoration-none  nav-item nav-link mx-2' to='/'><h3 className='text-white'>Fone4U</h3></Link>
+          <Link className='text-decoration-none  nav-item nav-link mx-2' to='/'><h3 className='text-white'>COP</h3></Link>
      
           <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
@@ -25,7 +25,10 @@ function MyNavbar() {
             <div class="d-flex align-items-lg-center mt-3 mt-lg-0">
             
                 <>
+                <Link className='border-0  text-decoration-none nav-item nav-link mx-2' to="/officersDashboard" >officers </Link>
+
                   <Link className='border-0  text-decoration-none nav-item nav-link mx-2' to="/register" >Register </Link>
+                  <Link className='border-0  text-decoration-none nav-item nav-link mx-2' to="/dashboard" >Dashboard </Link>
 
                   <Link className='text-decoration-none border-0  nav-item nav-link mx-2' to="/login" > Login</Link>
                 </>

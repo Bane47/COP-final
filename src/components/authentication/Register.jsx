@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/register.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cPassword, setCpassword] = useState('');
-    const [phone, setPhone] = useState('');
+    const [contact, setcontact] = useState('');
     const [image, setImage] = useState('');
-    const [role, setRole] = useState('User');
+    const [age,setAge] = useState();
+    const history = useNavigate();
 
     const emailRegEx = /^[A-Za-z0-9.]+@gmail.com$/;
     const passRegEx = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
-    const phoneRegEx = /^[6-9]{1}[0-9]{9}$/;
+    const contactRegEx = /^[6-9]{1}[0-9]{9}$/;
 
     const registerValidate = (e) => {
         e.preventDefault();
@@ -26,22 +28,23 @@ const Register = () => {
             alert('Please enter the password');
         } else if (cPassword === '') {
             alert('Please enter the confirm password');
-        } else if (phone === '') {
-            alert('Please enter the phone number');
+        } else if (contact === '') {
+            alert('Please enter the contact number');
         } else if (!emailRegEx.test(email)) {
             alert('Please enter a valid email id');
         } else if (!passRegEx.test(password)) {
             alert('The password should contain at least one uppercase, one lowercase, one number, and one special character, and the minimum length of the password is 8.');
-        } else if (!phoneRegEx.test(phone)) {
-            alert('Please enter a valid phone number');
+        } else if (!contactRegEx.test(contact)) {
+            alert('Please enter a valid contact number');
         } else if (password !== cPassword) {
             alert('Password and the confirm password do not match');
         } else {
             axios
-                .post('http://localhost:3001/post-civilian', { name, email, password, phone, role, image })
+                .post('http://localhost:3001/post-civilian', { name, age,email,contact, password, image })
                 .then((result) => {
                     console.log(result);
                     alert('Account created successfully');
+                    history('/login')
                 })
                 .catch((error) => {
                     console.log(error.response.data.error);
@@ -65,7 +68,7 @@ const Register = () => {
     };
 
     return (
-        <div className="justify-content-center">
+        <div className="justify-content-center wrapper-main">
             <div className="wrapper row col-12">
                 <h2>Registration</h2>
                 <form onSubmit={registerValidate}>
@@ -76,6 +79,15 @@ const Register = () => {
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+                    <div className="input-box">
+                        <input
+                            type="number"
+                            placeholder="Enter your age"
+                            required
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
                         />
                     </div>
                     <div className="input-box">
@@ -92,8 +104,8 @@ const Register = () => {
                             type="tel"
                             placeholder="Enter your contact number"
                             required
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            value={contact}
+                            onChange={(e) => setcontact(e.target.value)}
                         />
                     </div>
                     <div className="input-box">
@@ -122,15 +134,12 @@ const Register = () => {
                         onChange={convertToBase64}
                     />
                 </div>
-                    <div className="policy">
-                        <input type="checkbox" />
-                        <h3>I accept all terms & condition</h3>
-                    </div>
+                   
                     <div className="input-box button">
                         <input type="Submit" value="Register Now" />
                     </div>
                 </form>
-               
+               <p>Already have an account? <Link to='/login'>Login!</Link></p>
             </div>
         </div>
     );

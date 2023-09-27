@@ -2,6 +2,12 @@ import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MyNavbar from './components/navbar/Navbar';
 import Register from './components/authentication/Register';
+import Login from './components/authentication/Login';
+import Dashboard from './components/Dashboard/dashboard';
+import Footer from './components/footer/Footer';
+import ReportCrime from './components/Report/reportCrime';
+import OfficerDashboard from './components/Dashboard/officerDashboard';
+import Reports from './components/Report/reports';
 
 
 function App() {
@@ -11,17 +17,20 @@ function App() {
   return (
     <div className="App">
       <BrowserRouter>
+      
           <MyNavbar />
         <div className='row container'>
 
           {isLogged ? (
             <>
-              <div className='col-12 col-sm-3 col-lg-2 '>
-                {/* <SideBar /> */}
-              </div>
-              <div className='col-12 col-lg-10 col-md-8 col-sm-7 overflow-hidden mt-5 pt-5 '>
+            
                 <Routes>
+                <Route path='/dashboard' element={<Dashboard />} />
                 <Route path='/register' element={<Register />} />
+                <Route path='/login' element={<Login />} />
+                <Route path='/reportCrime' element={<ReportCrime />} />
+                <Route path='/officersDashboard' element={<OfficerDashboard />} />
+                <Route path='/firs' element={<Reports />} />
 
                   {/* <Route path='/' element={<Home />} />
                     <Route path='/register' element={<Register />} />
@@ -51,7 +60,6 @@ function App() {
                     <Route path='/password-reset/:id/:token' element={<ResetPassword />} /> */}
 
                 </Routes>
-              </div>
             </>
           )
             : (<>
@@ -72,7 +80,9 @@ function App() {
 
         </div>
 
+
       </BrowserRouter>
+      
     </div>
   );
 }
