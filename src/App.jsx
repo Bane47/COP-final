@@ -11,27 +11,33 @@ import Reports from './components/Report/reports';
 
 
 function App() {
-  const isLogged = true;
-  const role = 'Admin'
+  const isLogged = localStorage.getItem('loggedUser');
+  const role = localStorage.getItem('role')
 
   return (
     <div className="App">
       <BrowserRouter>
-      
-          <MyNavbar />
-        <div className='row container'>
 
-          {isLogged ? (
-            <>
-            
+        <MyNavbar />
+        <div className="container">
+          <div className='row' id='main-app'>
+
+            {isLogged ? (
+              <>
+
                 <Routes>
-                <Route path='/dashboard' element={<Dashboard />} />
-                <Route path='/register' element={<Register />} />
-                <Route path='/login' element={<Login />} />
-                <Route path='/reportCrime' element={<ReportCrime />} />
-                <Route path='/officersDashboard' element={<OfficerDashboard />} />
-                <Route path='/firs' element={<Reports />} />
 
+                  
+                  <Route path='/reportCrime' element={<ReportCrime />} />
+                  {role === 'officer' && (
+                    <>
+                      <Route path='/dashboard' element={<OfficerDashboard />} />
+                      <Route path='/firs' element={<Reports />} />
+                    </>
+                  )}
+                  {role === "civilian" && (
+                    <Route path='/dashboard' element={<Dashboard />} />
+                  )}
                   {/* <Route path='/' element={<Home />} />
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
@@ -60,12 +66,14 @@ function App() {
                     <Route path='/password-reset/:id/:token' element={<ResetPassword />} /> */}
 
                 </Routes>
-            </>
-          )
-            : (<>
-              <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
-                <Routes>
-                  {/* <Route path='/' element={<Home />} />
+              </>
+            )
+              : (<>
+                <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
+                  <Routes>
+                  <Route path='/register' element={<Register />} />
+                  <Route path='/login' element={<Login />} />
+                    {/* <Route path='/' element={<Home />} />
                     <Route path='/dashboard' element={<ErrorPage />} />
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
@@ -74,15 +82,15 @@ function App() {
                     <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
                     <Route path='/*' element={<ErrorPage />} /> */}
 
-                </Routes>
-              </div></>)}
+                  </Routes>
+                </div></>)}
 
 
-        </div>
+          </div></div>
 
 
       </BrowserRouter>
-      
+
     </div>
   );
 }

@@ -68,8 +68,8 @@ const Register = () => {
     };
 
     return (
-        <div className="justify-content-center wrapper-main">
-            <div className="wrapper row col-12">
+        <div className="mt-5 col-6 mx-auto ">
+            <div className="wrapper row  mt-5 register-form">
                 <h2>Registration</h2>
                 <form onSubmit={registerValidate}>
                     <div className="input-box">

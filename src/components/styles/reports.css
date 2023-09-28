@@ -1,0 +1,5 @@
+#table.main{
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: row !important;
+}

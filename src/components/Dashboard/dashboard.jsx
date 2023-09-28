@@ -7,6 +7,7 @@ import { useState } from 'react';
 import ReportCrime from '../Report/reportCrime';
 
 
+
 function Dashboard() {
   const [showModal, setShowModal] = useState(false);
 
@@ -23,6 +24,7 @@ function Dashboard() {
             <Button as="input" type="button" value="Click" onClick={() => setShowModal(true)} />
           </Card.Body>
         </Card>
+       
         <ReportCrime showModal={showModal} setShowModal={setShowModal} />
       </div>
     </>
