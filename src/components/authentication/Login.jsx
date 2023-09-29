@@ -7,7 +7,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(true); // New state for "Remember me" checkbox
-    const [userRole, setUserRole] = useState('civilian');
+    const [userRole, setUserRole] = useState('');
     // const [routeCategory, setRouteCategory] = useState('login-civilian')
     var routeCategory = 'login-civilian';
     const history = useNavigate();
@@ -23,18 +23,21 @@ const Login = () => {
 
             try {
                 if (userRole === "officer") { routeCategory = 'login-police' }
+                else{
+                    routeCategory = "login-civilian"
+                }
                 console.log(routeCategory)
                 axios
                     .post(`http://localhost:3001/${routeCategory}`, { email, password, rememberMe })
                     .then((result) => {
-                        console.log(result);
+                        console.log(result.data.user.name);
+                        
                         alert('Logged in successfully!');
                         localStorage.setItem('loggedUser', email);
                         localStorage.setItem('userName',result.data.user.name)
-                        if (userRole === "officer") {
-                            localStorage.setItem("role", userRole)
-                        } else localStorage.setItem('role', userRole);
+                        localStorage.setItem('role', userRole);
                         history('/dashboard')
+                        window.location.reload();
                     })
                     .catch((error) => {
                         console.log(error.response.data.error);

@@ -68,7 +68,9 @@ function MyNavbar() {
   const handleLogout = () => {
     localStorage.removeItem('loggedUser');
     localStorage.removeItem('role')
-    history('/dashboard')
+    localStorage.removeItem('userName')
+    history('/login');
+    window.location.reload();
   }
   return (
 

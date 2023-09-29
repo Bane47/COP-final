@@ -24,10 +24,11 @@ function App() {
 
             {isLogged ? (
               <>
-
+               
                 <Routes>
+                  {console.log(role)}
 
-                  
+
                   <Route path='/reportCrime' element={<ReportCrime />} />
                   {role === 'officer' && (
                     <>
@@ -38,32 +39,10 @@ function App() {
                   {role === "civilian" && (
                     <Route path='/dashboard' element={<Dashboard />} />
                   )}
-                  {/* <Route path='/' element={<Home />} />
-                    <Route path='/register' element={<Register />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/phones' element={<Phones />} />
-                    <Route path='/dashboard' element={<UserDashBoard />} />
-                    <Route path='/*' element={<ErrorPage />} /> */}
 
 
-                  {role === "Admin" && (
-                    <>
-                      {/* <Route path='/manage' element={<Manage />} />
-                        <Route path='/addphones' element={<AddPhone />} />
-                        <Route path='/dashboard' element={<Dashboard />} />
-                        <Route path='/AdminFeedBack' element={<AdminFeedBack />} /> */}
 
-                    </>
-                  )}
 
-                  {role === "User" && (
-                    <>
-                      {/* <Route path='/feedback' element={<Feedback />} />                       */}
-                    </>
-                  )}
-                  {/* <Route path='/profile' element={<Profile />} />
-                    <Route path='/ForgotPassword' element={<ForgotPassword />} />
-                    <Route path='/password-reset/:id/:token' element={<ResetPassword />} /> */}
 
                 </Routes>
               </>
@@ -71,8 +50,10 @@ function App() {
               : (<>
                 <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
                   <Routes>
-                  <Route path='/register' element={<Register />} />
-                  <Route path='/login' element={<Login />} />
+                    <Route path='/register' element={<Register />} />
+                    <Route path='/login' element={<Login />} />
+                    <Route path='/dashboard' element={<Dashboard />} />
+
                     {/* <Route path='/' element={<Home />} />
                     <Route path='/dashboard' element={<ErrorPage />} />
                     <Route path='/register' element={<Register />} />

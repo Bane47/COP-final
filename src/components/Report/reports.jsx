@@ -4,7 +4,7 @@ import DataTable from 'react-data-table-component'
 
 const Reports = () => {
     const [registrationTime, setRegistrationTime] = useState(null);
-
+    const officer = localStorage.getItem('userName')
     const columns = [
         {
             name: "Crime Type",
@@ -35,16 +35,16 @@ const Reports = () => {
             selector: row => row.confidentiality
         },
         {
-            name: "Register",
+            name: "Investigate",
             cell: (row) => (
-                <button onClick={() => fileFIR(row)}>Register</button>
+                <button onClick={() => fileFIR(row)}>Investigate</button>
             ),
             button: true,
         },
         {
             name: "Delete",
             cell: (row) => (
-                <button onClick={() => handleDelete(row)}>Delete</button>
+                <button onClick={() => handleDelete(row)}>Decline</button>
             ),
             button: true,
         }
@@ -63,6 +63,7 @@ const Reports = () => {
 
     useEffect(() => {
         fetchData();
+        console.log(officer)
     }, [])
 
     const [filterText, setFilterText] = useState('');
@@ -79,21 +80,66 @@ const Reports = () => {
     };
 
     const fileFIR = (row) => {
-        const timestamp = new Date(); // Get the current timestamp
-        setRegistrationTime(timestamp);
-        axios.post('http://localhost:3001/file-fir', row,timestamp)
+        const type = row.type;
+        const dateTime = row.dateTime;
+        const location = row.location;
+        const description = row.description;
+        const evidence = row.evidence;
+        const vehicles = row.vehicles;
+        const suspect = row.suspect;
+        const contact = row.contact;
+        const confidentiality = row.confidentiality;
+
+        const firRegisteredAt = new Date(); // Get the current timestamp
+        setRegistrationTime(firRegisteredAt);
+
+        axios.post('http://localhost:3001/file-fir', { type, dateTime, location, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer })
             .then((response) => {
                 console.log(response);
-            }).catch((error)=>{
+            }).catch((error) => {
                 console.error(error);
-            })
+            });
+        axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
+        .then((response)=>{
+            console.log(response);
+        }).catch((err)=>{
+            console.log(err);
+        })
         console.log("Edit row:", row);
     };
 
 
     const handleDelete = (row) => {
         // Implement the logic to delete the row here
-        console.log("Delete row:", row);
+        const type = row.type;
+        const dateTime = row.dateTime;
+        const location = row.location;
+        const description = row.description;
+        const evidence = row.evidence;
+        const vehicles = row.vehicles;
+        const suspect = row.suspect;
+        const contact = row.contact;
+        const confidentiality = row.confidentiality;
+        const firRegisteredAt = new Date(); // Get the current timestamp
+        setRegistrationTime(firRegisteredAt);
+        
+
+        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer })
+        .then((response) => {
+            console.log(response);
+        }).catch((error) => {
+            console.error(error);
+        })
+        axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
+        .then((response)=>{
+            alert("Crime report is declined");
+            window.location.reload();
+        })
+        .catch((error)=>{
+            console.error(error);
+            alert("Couldn't decline the report")
+        })
+        
     };
 
     return (
