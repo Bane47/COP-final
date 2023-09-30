@@ -10,6 +10,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
   const [status, setStatus] = useState('');
   const [registeredStatus, setregisteredStatus] = useState('');
   const [solvedStatus, setSolvedStatus] = useState('');
+  const [deletedstatus,setDeletedStatus]= useState('');
   const [otherCrimeType, setOtherCrimeType] = useState();
   const [ComplaintCode, setComplaintCode] = useState(0);
   const [showComplaintCodeModal, setShowComplaintCodeModal] = useState(false);
@@ -175,7 +176,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     const url1 = `http://localhost:3001/check-status-unregistered/${email}`;
     const url2 = `http://localhost:3001/check-status-registered/${email}`;
     const url3 = `http://localhost:3001/check-status-solved/${email}`;
-
+    const url4 = `http://localhost:3001/get-softDelete/${email}`;
     axios.get(url1)
       .then((response) => {
         setStatus(response.data);
@@ -195,6 +196,15 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     axios.get(url3)
       .then((response) => {
         setSolvedStatus(response.data);
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.log(email);
+        console.log(error)
+      });
+      axios.get(url4)
+      .then((response) => {
+        setDeletedStatus(response.data);
         console.log(response.data)
       })
       .catch((error) => {
@@ -417,15 +427,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                            {data.status === 'Complaint registered' && (
                               <h5 className='text-secondary'>{data.status}</h5>
-                            )}
-                            {data.status === 'Under Investigation' && (
-                              <h5 className='text-danger'>{data.status}</h5>
-                            )}
-                            {data.status === 'Solved' && (
-                              <h5 className='text-success'>{data.status}</h5>
-                            )}
                           </div>
 
                         </div>
@@ -457,16 +459,9 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                            {data.status === 'Complaint registered' && (
-                              <h5 className='text-secondary'>{data.status}</h5>
-                            )}
-                            {data.status === 'Under Investigation' && (
-                              <h5 className='text-info'>{data.status}</h5>
-                            )}
                            
-                            {data.status === 'solved' && (
-                              <h5 className='text-success'>{data.status}</h5>
-                            )}
+                              <h5 className='text-info'>{data.status}</h5>
+                           
                           </div>
 
                         </div>
@@ -497,15 +492,42 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                            {data.status === 'Complaint registered' && (
-                              <h5 className='text-secondary'>{data.status}</h5>
-                            )}
-                            {data.status === 'Under Investigation' && (
-                              <h5 className='text-danger'>{data.status}</h5>
-                            )}
-                            {data.status === 'Solved' && (
+                          
                               <h5 className='text-success'>{data.status}</h5>
-                            )}
+                         
+                          </div>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+
+              )}
+               {deletedstatus.length > 0 && (
+                <div>
+                  {deletedstatus.map((data) => {
+                    return (
+                      <div key={data.id} className='mt-2'>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Complaint Code : </h5>
+                          </div>
+                          <div className="col-6">
+                            <h5>{data.complaintCode}</h5>
+
+                          </div>
+
+                        </div>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Status : </h5>
+                          </div>
+                          <div className="col-6">
+                              <h5 className='text-danger'>{data.status}</h5>
+                       
+                          
                           </div>
 
                         </div>

@@ -132,11 +132,12 @@ const Reports = () => {
         const userEmail = row.userEmail;
         const userName = row.userName;
         const reportedAt = row.reportedAt;
+        const complaintCode = row.complaintCode;
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
 
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt })
+        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
                 console.log(response);
             }).catch((error) => {
