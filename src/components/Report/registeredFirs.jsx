@@ -154,7 +154,7 @@ const RegisteredFirs = () => {
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
-        axios.put(`http://localhost:3001/solve-fir/${row._id}`, {
+        axios.post(`http://localhost:3001/solve-fir`, {
             type,
             dateTime,
             location,
@@ -173,17 +173,18 @@ const RegisteredFirs = () => {
             complaintCode
         })
             .then((response) => {
+                
                 console.log(response);
             }).catch((error) => {
                 console.log(error);
             });
 
-        axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
-        .then((response)=>{
-            console.log(response);
-        }).catch((err)=>{
-            console.log(err);
-        })
+        // axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
+        // .then((response)=>{
+        //     console.log(response);
+        // }).catch((err)=>{
+        //     console.log(err);
+        // })
         console.log("Edit row:", row);
     };
 

@@ -195,6 +195,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     axios.get(url3)
       .then((response) => {
         setSolvedStatus(response.data);
+        console.log(response.data)
       })
       .catch((error) => {
         console.log(email);
