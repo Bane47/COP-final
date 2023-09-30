@@ -147,7 +147,6 @@ const RegisteredFirs = () => {
         const vehicles = row.vehicles;
         const suspect = row.suspect;
         const contact = row.contact;
-        const confidentiality = row.confidentiality;
         const userEmail = row.userEmail;
         const userName = row.userEmail;
         const reportedAt = row.reportedAt;
@@ -165,7 +164,6 @@ const RegisteredFirs = () => {
             vehicles,
             suspect,
             contact,
-            confidentiality,
             status: 'Solved',
             firRegisteredAt,
             officer,
@@ -201,7 +199,6 @@ const RegisteredFirs = () => {
         const vehicles = row.vehicles;
         const suspect = row.suspect;
         const contact = row.contact;
-        const confidentiality = row.confidentiality;
         const userEmail = row.userEmail;
         const userName = row.userName;
         const reportedAt = row.reportedAt;
@@ -210,7 +207,7 @@ const RegisteredFirs = () => {
         setRegistrationTime(firRegisteredAt);
 
 
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
+        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact,firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
                 console.log(response);
             }).catch((error) => {

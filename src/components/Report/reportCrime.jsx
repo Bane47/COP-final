@@ -6,9 +6,13 @@ import axios from 'axios'
 const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
   const userName = localStorage.getItem('userName');
   const email = localStorage.getItem('loggedUser');
+  const contact = localStorage.getItem('contact')
   const [status, setStatus] = useState('');
+  const [registeredStatus, setregisteredStatus] = useState('');
+  const [solvedStatus, setSolvedStatus] = useState('');
   const [otherCrimeType, setOtherCrimeType] = useState();
-  // const [complaintCode, setComplaintCode] = useState(0);
+  const [ComplaintCode, setComplaintCode] = useState(0);
+  const [showComplaintCodeModal, setShowComplaintCodeModal] = useState(false);
   var complaintCode;
 
   const [crimeDetails, setCrimeDetails] = useState({
@@ -79,14 +83,16 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     setErrors({ ...errors, [name]: '' });
   };
   const generateCode = (location, stationCode) => {
-    complaintCode=location + stationCode + Math.floor(Math.random() * 100000);
+    complaintCode = location + stationCode + Math.floor(Math.random() * 100000);
 
   }
   const handleSubmit = (e) => {
     e.preventDefault();
     generateCode(crimeDetails.location, policeStationCode)
-    console.log(complaintCode)
-    const mandatoryFields = ['crimeType', 'dateTime', 'location', 'description', 'contact', 'confidentiality'];
+    if (crimeDetails.crimeType === "Others") {
+      setCrimeDetails({ ...crimeDetails, ['crimeType']: otherCrimeType })
+    }
+    const mandatoryFields = ['crimeType', 'dateTime', 'location', 'description'];
     let hasError = false;
     const updatedErrors = {};
     mandatoryFields.forEach((field) => {
@@ -101,9 +107,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     }
     const reportTime = new Date()
 
-    if (crimeDetails.crimeType === "Others") {
-      setCrimeDetails({ ...crimeDetails, ['crimeType']: otherCrimeType })
-    }
+
 
     axios.post('http://localhost:3001/post-crimes', {
       type: crimeDetails.crimeType,
@@ -111,7 +115,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
       location: crimeDetails.location,
       stationCode: policeStationCode,
       description: crimeDetails.description,
-      contact: crimeDetails.contact,
+      contact: contact,
       confidentiality: crimeDetails.confidentiality,
       userName: userName,
       userEmail: email,
@@ -123,8 +127,9 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
       if (response.status === 201) {
         console.log("Crime reported")
         alert('Crime reported successfully');
+        setComplaintCode(complaintCode);
         setShowModal(false);
-
+        setShowComplaintCodeModal(true);
         setCrimeDetails({
           crimeType: '',
           dateTime: '',
@@ -135,25 +140,43 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
           vehicles: '',
           suspect: '',
           contact: '',
-          confidentiality: '',
           status: '',
           complaintCode: ''
         });
+
+        return (
+          <Modal show={showComplaintCodeModal} onHide={() => setShowComplaintCodeModal(false)} id="complaintCodeModal">
+            <Modal.Header closeButton>
+              <Modal.Title>Complaint Code</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Your complaint has been registered successfully.</p>
+              <p>Complaint Code: {complaintCode}</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowComplaintCodeModal(false)}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        )
+
       } else {
         console.error('Failed to report the crime. Please try again later.');
       }
     })
       .catch((error) => {
-        console.log(complaintCode)
         console.error('Error during crime reporting:', error);
       });
 
   };
 
   const statusCheck = () => {
-    const url = `http://localhost:3001/check-status/${email}`;
+    const url1 = `http://localhost:3001/check-status-unregistered/${email}`;
+    const url2 = `http://localhost:3001/check-status-registered/${email}`;
+    const url3 = `http://localhost:3001/check-status-solved/${email}`;
 
-    axios.get(url)
+    axios.get(url1)
       .then((response) => {
         setStatus(response.data);
       })
@@ -161,22 +184,47 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
         console.log(email);
         console.log(error)
       });
-      axios.get(url)
+    axios.get(url2)
       .then((response) => {
-        setStatus(response.data);
+        setregisteredStatus(response.data);
+      })
+      .catch((error) => {
+        console.log(email);
+        console.log(error)
+      });
+    axios.get(url3)
+      .then((response) => {
+        setSolvedStatus(response.data);
       })
       .catch((error) => {
         console.log(email);
         console.log(error)
       });
   }
+
   useEffect(() => {
     statusCheck();
-
   }, [])
 
   return (
     <>
+      {complaintCode && (
+        <Modal show={showComplaintCodeModal} onHide={() => setShowComplaintCodeModal(false)} id="complaintCodeModal">
+          <Modal.Header closeButton>
+            <Modal.Title>Complaint Code</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Your complaint has been registered successfully.</p>
+            <p>Complaint Code: {complaintCode}</p>
+            <p>Use this code to check the status of your complaint</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowComplaintCodeModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
 
       {crimeReport && (
         <Modal show={showModal} onHide={() => setShowModal(false)} id="customModal">
@@ -323,34 +371,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                   onChange={handleInputChange}
                 />
               </Form.Group>
-              <Form.Group id="formContact">
-                <Form.Label>Contact</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="contact"
-                  value={crimeDetails.contact}
-                  onChange={handleInputChange}
-                  required
-                  isInvalid={!!errors.contact}
-                />
-                <Form.Control.Feedback type="invalid">{errors.contact}</Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group id="formConfidentiality">
-                <Form.Label>Confidentiality</Form.Label>
-                <Form.Control
-                  as="select"
-                  name="confidentiality"
-                  value={crimeDetails.confidentiality}
-                  onChange={handleInputChange}
-                  required
-                  isInvalid={!!errors.confidentiality}
-                >
-                  <option value="">Select an option</option>
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-                </Form.Control>
-                <Form.Control.Feedback type="invalid">{errors.confidentiality}</Form.Control.Feedback>
-              </Form.Group>
+
             </Form>
           </Modal.Body>
           <Modal.Footer>
@@ -371,53 +392,130 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
             <Modal.Title>Complaint status</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-
-
-            {status.length > 0 ? (
-              <div>
-                {status.map((data) => {
-                  return (
-                    <div key={data.id} className='mt-2'>
-                      <div className="row">
-                        <div className="col-6">
-                          <h5>Complaint Code : </h5>
-                        </div>
-                        <div className="col-6">
-                        <h5>{data.complaintCode}</h5>
-
-                        </div>
-                        
-                      </div>
-                      <div className="row">
-                        <div className="col-6">
-                          <h5>Status : </h5>
-                        </div>
-                        <div className="col-6">
-                          {data.status==='Complaint registered' && (
-                        <h5 className='text-secondary'>{data.status}</h5>
-                        )}
-                        {data.status==='Under Investigation' && (
-                        <h5 className='text-danger'>{data.status}</h5>
-                        )}
-                        {data.status==='Solved' && (
-                        <h5 className='text-success'>{data.status}</h5>
-                        )}
-                        </div>
-                        
-                      </div>
-                     
-                    </div>
-                  );
-                })}
-              </div>
-            ):(
-              <div>
-                <h4 className='text-secondary'>
-                  There are no complaints registered!
-                </h4>
-              </div>
+            {status.length === 0 && registeredStatus.length === 0 && solvedStatus.length === 0 && (
+              <h4 className='text-secondary'>There are no complaints!</h4>
             )}
 
+            <>
+              {status.length > 0 && (
+                <div>
+                  {status.map((data) => {
+                    return (
+                      <div key={data.id} className='mt-2'>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Complaint Code : </h5>
+                          </div>
+                          <div className="col-6">
+                            <h5>{data.complaintCode}</h5>
+                          </div>
+
+                        </div>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Status : </h5>
+                          </div>
+                          <div className="col-6">
+                            {data.status === 'Complaint registered' && (
+                              <h5 className='text-secondary'>{data.status}</h5>
+                            )}
+                            {data.status === 'Under Investigation' && (
+                              <h5 className='text-danger'>{data.status}</h5>
+                            )}
+                            {data.status === 'Solved' && (
+                              <h5 className='text-success'>{data.status}</h5>
+                            )}
+                          </div>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+
+              )}
+
+              {registeredStatus.length > 0 && (
+                <div>
+                  {registeredStatus.map((data) => {
+                    return (
+                      <div key={data.id} className='mt-2'>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Complaint Code : </h5>
+                          </div>
+                          <div className="col-6">
+                            <h5 >{data.complaintCode}</h5>
+
+                          </div>
+
+                        </div>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Status : </h5>
+                          </div>
+                          <div className="col-6">
+                            {data.status === 'Complaint registered' && (
+                              <h5 className='text-secondary'>{data.status}</h5>
+                            )}
+                            {data.status === 'Under Investigation' && (
+                              <h5 className='text-info'>{data.status}</h5>
+                            )}
+                           
+                            {data.status === 'solved' && (
+                              <h5 className='text-success'>{data.status}</h5>
+                            )}
+                          </div>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+
+              )}
+              {solvedStatus.length > 0 && (
+                <div>
+                  {solvedStatus.map((data) => {
+                    return (
+                      <div key={data.id} className='mt-2'>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Complaint Code : </h5>
+                          </div>
+                          <div className="col-6">
+                            <h5>{data.complaintCode}</h5>
+
+                          </div>
+
+                        </div>
+                        <div className="row">
+                          <div className="col-6">
+                            <h5>Status : </h5>
+                          </div>
+                          <div className="col-6">
+                            {data.status === 'Complaint registered' && (
+                              <h5 className='text-secondary'>{data.status}</h5>
+                            )}
+                            {data.status === 'Under Investigation' && (
+                              <h5 className='text-danger'>{data.status}</h5>
+                            )}
+                            {data.status === 'Solved' && (
+                              <h5 className='text-success'>{data.status}</h5>
+                            )}
+                          </div>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+
+              )}
+            </>
 
           </Modal.Body>
           <Modal.Footer>

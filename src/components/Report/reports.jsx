@@ -93,7 +93,6 @@ const Reports = () => {
         const vehicles = row.vehicles;
         const suspect = row.suspect;
         const contact = row.contact;
-        const confidentiality = row.confidentiality;
         const userEmail = row.userEmail;
         const userName = row.userEmail;
         const reportedAt = row.reportedAt;
@@ -102,7 +101,7 @@ const Reports = () => {
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
-        axios.post('http://localhost:3001/file-fir', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, status: 'Under Investigation', firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
+        axios.post('http://localhost:3001/file-fir', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, status: 'Under Investigation', firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
                 console.log(response);
                 axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
@@ -130,7 +129,6 @@ const Reports = () => {
         const vehicles = row.vehicles;
         const suspect = row.suspect;
         const contact = row.contact;
-        const confidentiality = row.confidentiality;
         const userEmail = row.userEmail;
         const userName = row.userName;
         const reportedAt = row.reportedAt;
@@ -138,7 +136,7 @@ const Reports = () => {
         setRegistrationTime(firRegisteredAt);
 
 
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer, userEmail, userName, reportedAt })
+        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt })
             .then((response) => {
                 console.log(response);
             }).catch((error) => {

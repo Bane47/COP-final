@@ -30,10 +30,11 @@ const Login = () => {
                 axios
                     .post(`http://localhost:3001/${routeCategory}`, { email, password, rememberMe })
                     .then((result) => {
-                        console.log(result.data.user.name);
+                        console.log(result.data.user);
                         
                         alert('Logged in successfully!');
                         localStorage.setItem('loggedUser', email);
+                        localStorage.setItem('contact',result.data.user.contact)
                         localStorage.setItem('userName',result.data.user.name)
                         localStorage.setItem('role', userRole);
                         history('/dashboard')
