@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component'
 
-const Reports = () => {
+const RegisteredFirs = () => {
     const [registrationTime, setRegistrationTime] = useState(null);
     const officer = localStorage.getItem('userName')
     const columns = [
@@ -12,63 +12,117 @@ const Reports = () => {
             sortable: true,
             style: {
                 fontWeight: 'bold',
-                color: 'blue',
+                color: 'black',
+                backgroundColor: 'lightblue',
+                width: '100px'
             }
         },
         {
             name: "Description",
             selector: row => row.description,
-            sortable: true
+            sortable: true,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
             name: "Location",
             selector: row => row.location,
-            sortable: true
+            sortable: true,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
             name: "Contact",
             selector: row => row.contact,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
             name: "Date and Time",
             selector: row => row.dateTime,
-            sortable: true
+            sortable: true,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
             name: "Confidentiality",
-            selector: row => row.confidentiality
+            selector: row => row.confidentiality,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
-            name: "Investigate",
+            name: "Status",
+            selector: row => row.status,
+            style: {
+                color: 'green',
+                fontWeight: "bold",
+                backgroundColor: 'lightblue'
+            }
+        },
+
+        {
+            name: "Update",
             cell: (row) => (
-                <button onClick={() => fileFIR(row)}>Investigate</button>
+                <button onClick={() => fileFIR(row)} className='btn' >Solve</button>
             ),
             button: true,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         },
         {
             name: "Delete",
             cell: (row) => (
-                <button onClick={() => handleDelete(row)}>Decline</button>
+                <button onClick={() => handleDelete(row)} className='btn'>Pending</button>
             ),
             button: true,
+            style: {
+                fontWeight: 'bold',
+                color: 'black',
+                backgroundColor: 'lightblue'
+            }
         }
     ];
+    const customStyles = {
+        head: {
+            style: {
+                backgroundColor: 'lightblue',
+                color: 'Black',
+
+            },
+        },
+    };
 
     const [reportData, setReportData] = useState([]);
 
     const fetchData = () => {
-        axios.get('http://localhost:3001/get-crimes')
+        axios.get('http://localhost:3001/registered-firs')
             .then((response) => {
                 setReportData(response.data)
                 console.log(response.data, "This is the value")
-            })
+            });
     }
-
 
     useEffect(() => {
         fetchData();
-        console.log(officer)
-    }, [])
+    }, []);
 
     const [filterText, setFilterText] = useState('');
     const [filteredData, setFilteredData] = useState(reportData);
@@ -98,23 +152,40 @@ const Reports = () => {
         const userName = row.userEmail;
         const reportedAt = row.reportedAt;
         const complaintCode = row.complaintCode;
-
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
-        axios.post('http://localhost:3001/file-fir', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, status: 'Under Investigation', firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
+        axios.put(`http://localhost:3001/solve-fir/${row._id}`, {
+            type,
+            dateTime,
+            location,
+            stationCode,
+            description,
+            evidence,
+            vehicles,
+            suspect,
+            contact,
+            confidentiality,
+            status: 'Solved',
+            firRegisteredAt,
+            officer,
+            userEmail,
+            userName,
+            reportedAt,
+            complaintCode
+        })
             .then((response) => {
                 console.log(response);
-                axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
-                    .then((response) => {
-                        console.log(response);
-                    }).catch((err) => {
-                        console.log(err);
-                    })
             }).catch((error) => {
-                console.error(error);
+                console.log(error);
             });
 
+        axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
+        .then((response)=>{
+            console.log(response);
+        }).catch((err)=>{
+            console.log(err);
+        })
         console.log("Edit row:", row);
     };
 
@@ -135,23 +206,25 @@ const Reports = () => {
         const userName = row.userName;
         const reportedAt = row.reportedAt;
         const firRegisteredAt = new Date(); // Get the current timestamp
+        const complaintCode = row.complaintCode;
         setRegistrationTime(firRegisteredAt);
 
 
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer, userEmail, userName, reportedAt })
+        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, confidentiality, firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
                 console.log(response);
             }).catch((error) => {
-                console.error(error);
+                console.log(error);
             })
         axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
             .then((response) => {
+                console.log(response);
                 alert("Crime report is declined");
-                window.location.reload();
+                // window.location.reload();
             })
             .catch((error) => {
-                console.error(error);
-                alert("Couldn't decline the report")
+                console.log(error);
+                alert("Couldn't decline the report");
             })
 
     };
@@ -164,9 +237,8 @@ const Reports = () => {
                         <div className='text-end mb-4'>
                             <input type="text" value={filterText} placeholder=' Search a crime' onChange={handleFilter} />
                         </div>
-                        {console.log(reportData)}
                         <div >
-                            <DataTable id="datatable-main" columns={columns} data={filteredData} fixedHeader highlightOnHover subHeaderWrap expandOnRowClicked responsive progressComponent pagination striped />
+                            <DataTable id="datatable-main" columns={columns} data={filteredData} noHeader fixedHeader highlightOnHover subHeaderWrap expandOnRowClicked responsive progressComponent pagination striped customStyles={customStyles} />
                         </div>
                     </div>
                 </div>
@@ -175,4 +247,4 @@ const Reports = () => {
     );
 };
 
-export default Reports;
+export default RegisteredFirs;

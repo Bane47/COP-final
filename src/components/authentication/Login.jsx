@@ -65,7 +65,7 @@ const Login = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
-                        {console.log(routeCategory)}
+                       
                         <div className="input-box">
                             <input
                                 type="password"

@@ -13,6 +13,14 @@ const OfficerDashboard = () => {
           </Card.Body>
         </Card>
     </div>
+    <div className='mt-5'>
+        <Card>
+          <Card.Body>
+            <h2>Look at the over all FIRs!</h2>
+            <Link to='/registeredFirs'><Button>Click</Button></Link>
+          </Card.Body>
+        </Card>
+    </div>
     </div>
   )
 }

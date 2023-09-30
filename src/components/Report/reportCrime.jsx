@@ -6,12 +6,16 @@ import axios from 'axios'
 const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
   const userName = localStorage.getItem('userName');
   const email = localStorage.getItem('loggedUser');
-  const [status,setStatus] = useState('')
+  const [status, setStatus] = useState('');
+  const [otherCrimeType, setOtherCrimeType] = useState();
+  // const [complaintCode, setComplaintCode] = useState(0);
+  var complaintCode;
 
   const [crimeDetails, setCrimeDetails] = useState({
     crimeType: '',
     dateTime: '',
     location: '',
+    stationCode: '',
     description: '',
     evidence: '',
     vehicles: '',
@@ -28,20 +32,63 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     description: '',
     contact: '',
   });
+  const [area, setArea] = useState(''); // State variable to store the selected area
+  const [policeStationCode, setPoliceStationCode] = useState('');
+
+
+  // Define a mapping of areas to police station codes
+  const areaToCodeMap = {
+    Vadavalli: 'A1',
+    Ukkadam: 'A2',
+    'Variety Hall Road': 'A3',
+    Bazaar: 'A4',
+    'R.S. Puram': 'A5',
+    Saravanapatti: 'B1',
+    Ramanathapuram: 'B2',
+    Peelamedu: 'B3',
+    Singanallur: 'B4',
+    Kavundampalayam: 'C1',
+    Thudialur: 'C2',
+    Gandhipuram: 'C3',
+    'Race Course': 'C4',
+    Kattur: 'C5',
+    'Saibaba Colony': 'C6',
+    Rathinapuri: 'C7',
+    'Awps - Coimbatore South': 'D1',
+    Sundarapuram: 'D2',
+    Karumbukadai: 'D3',
+    Selvapuram: 'D4',
+    kuniamuthur: 'D5',
+    podanur: 'D6',
+    'Ramanathapuram (South)': 'D7',
+  };
+
+  // Function to handle area selection
+  const handleAreaChange = (event) => {
+    const selectedArea = event.target.value;
+    setArea(selectedArea);
+    setCrimeDetails({ ...crimeDetails, 'location': selectedArea })
+    // Set the police station code based on the selected area
+    setPoliceStationCode(areaToCodeMap[selectedArea]);
+
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setCrimeDetails({ ...crimeDetails, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
+  const generateCode = (location, stationCode) => {
+    complaintCode=location + stationCode + Math.floor(Math.random() * 100000);
 
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    generateCode(crimeDetails.location, policeStationCode)
+    console.log(complaintCode)
     const mandatoryFields = ['crimeType', 'dateTime', 'location', 'description', 'contact', 'confidentiality'];
     let hasError = false;
     const updatedErrors = {};
-
     mandatoryFields.forEach((field) => {
       if (!crimeDetails[field]) {
         hasError = true;
@@ -54,43 +101,50 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     }
     const reportTime = new Date()
 
+    if (crimeDetails.crimeType === "Others") {
+      setCrimeDetails({ ...crimeDetails, ['crimeType']: otherCrimeType })
+    }
 
     axios.post('http://localhost:3001/post-crimes', {
       type: crimeDetails.crimeType,
       dateTime: crimeDetails.dateTime,
       location: crimeDetails.location,
+      stationCode: policeStationCode,
       description: crimeDetails.description,
       contact: crimeDetails.contact,
       confidentiality: crimeDetails.confidentiality,
       userName: userName,
-      userEmail:email,
+      userEmail: email,
       reportedAt: reportTime,
-      status: "Complaint registered"
+      status: "Complaint registered",
+      complaintCode: complaintCode
     }).then((response) => {
       console.log(response)
       if (response.status === 201) {
         console.log("Crime reported")
-        toast.success('Crime reported successfully');
+        alert('Crime reported successfully');
         setShowModal(false);
 
         setCrimeDetails({
-
           crimeType: '',
           dateTime: '',
           location: '',
+          stationCode: '',
           description: '',
           evidence: '',
           vehicles: '',
           suspect: '',
           contact: '',
           confidentiality: '',
-          status: false,
+          status: '',
+          complaintCode: ''
         });
       } else {
         console.error('Failed to report the crime. Please try again later.');
       }
     })
       .catch((error) => {
+        console.log(complaintCode)
         console.error('Error during crime reporting:', error);
       });
 
@@ -98,10 +152,18 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
 
   const statusCheck = () => {
     const url = `http://localhost:3001/check-status/${email}`;
-   
+
     axios.get(url)
       .then((response) => {
-        setStatus(response.data)
+        setStatus(response.data);
+      })
+      .catch((error) => {
+        console.log(email);
+        console.log(error)
+      });
+      axios.get(url)
+      .then((response) => {
+        setStatus(response.data);
       })
       .catch((error) => {
         console.log(email);
@@ -110,10 +172,12 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
   }
   useEffect(() => {
     statusCheck();
+
   }, [])
 
   return (
     <>
+
       {crimeReport && (
         <Modal show={showModal} onHide={() => setShowModal(false)} id="customModal">
           <Modal.Header closeButton>
@@ -121,7 +185,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <Form.Group controlId="formCrimeType">
+              <Form.Group id="formCrimeType">
                 <Form.Label>Type of Crime</Form.Label>
                 <Form.Control
                   as="select"
@@ -139,7 +203,21 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 </Form.Control>
                 <Form.Control.Feedback type="invalid">{errors.crimeType}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formDateTime">
+              {crimeDetails.crimeType === "Others" && (
+                <Form.Group id="formLocation">
+                  <Form.Label>Enter the crime type</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="crimeType"
+                    value={otherCrimeType}
+                    onChange={(e) => setOtherCrimeType(e.target.value)}
+                    required
+                    isInvalid={!!errors.location}
+                  />
+                  <Form.Control.Feedback type="invalid">{errors.location}</Form.Control.Feedback>
+                </Form.Group>
+              )}
+              <Form.Group id="formDateTime">
                 <Form.Label>Date and Time of Incident</Form.Label>
                 <Form.Control
                   type="datetime-local"
@@ -151,19 +229,58 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 />
                 <Form.Control.Feedback type="invalid">{errors.dateTime}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formLocation">
-                <Form.Label>Location</Form.Label>
+              <Form.Group id="formLocation">
+                <Form.Label>Area</Form.Label>
                 <Form.Control
-                  type="text"
+                  as="select"
                   name="location"
                   value={crimeDetails.location}
-                  onChange={handleInputChange}
+                  onChange={handleAreaChange}
                   required
                   isInvalid={!!errors.location}
-                />
+                >
+                  <option value="">Location of crime</option>
+
+                  <optgroup label="Coimbatore West ACP Office">
+                    <option value="Vadavalli">Vadavalli</option>
+                    <option value="Ukkadam">Ukkadam</option>
+                    <option value="Variety Hall Road">Variety Hall Road</option>
+                    <option value="Bazaar">Bazaar</option>
+                    <option value="R.S.Puram">R.S. Puram</option>
+                  </optgroup>
+
+
+                  <optgroup label="Coimbatore East ACP Office">
+                    <option value="Saravanapatti">Saravanapatti</option>
+                    <option value="Ramanathapuram">Ramanathapuram</option>
+                    <option value="Peelamedu">Peelamedu</option>
+                    <option value="Singanallur">Singanallur</option>
+                  </optgroup>
+
+                  <optgroup label="Coimbatore Central ACP Office">
+                    <option value="Kavundampalayam">Kavundampalayam</option>
+                    <option value="Thudialur">Thudialur</option>
+                    <option value="Gandhipuram">Gandhipuram</option>
+                    <option value="Race Course">Race Course</option>
+                    <option value="Kattur">Kattur</option>
+                    <option value="Saibaba Colony">Saibaba Colony</option>
+                    <option value="Rathinapuri">Rathinapuri</option>
+                  </optgroup>
+
+
+                  <optgroup label="Coimbatore South ACP Office">
+                    <option value="Awps - Coimbatore South">Awps - Coimbatore South</option>
+                    <option value="Sundarapuram">Sundarapuram</option>
+                    <option value="Karumbukadai">Karumbukadai</option>
+                    <option value="Selvapuram">Selvapuram</option>
+                    <option value="kuniamuthur">Kuniamuthur</option>
+                    <option value="podanur">Podanur</option>
+                    <option value="Ramanathapuram">Ramanathapuram</option>
+                  </optgroup>
+                </Form.Control>
                 <Form.Control.Feedback type="invalid">{errors.location}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formDescription">
+              <Form.Group id="formDescription">
                 <Form.Label>Crime Description</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -176,7 +293,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 />
                 <Form.Control.Feedback type="invalid">{errors.description}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formEvidence">
+              <Form.Group id="formEvidence">
                 <Form.Label>Evidence</Form.Label>
                 <Form.Control
                   type="text"
@@ -188,7 +305,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 />
                 <Form.Control.Feedback type="invalid">{errors.evidence}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formVehicles">
+              <Form.Group id="formVehicles">
                 <Form.Label>Vehicles (Optional)</Form.Label>
                 <Form.Control
                   type="text"
@@ -197,7 +314,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                   onChange={handleInputChange}
                 />
               </Form.Group>
-              <Form.Group controlId="formSuspect">
+              <Form.Group id="formSuspect">
                 <Form.Label>Suspect</Form.Label>
                 <Form.Control
                   type="text"
@@ -206,7 +323,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                   onChange={handleInputChange}
                 />
               </Form.Group>
-              <Form.Group controlId="formContact">
+              <Form.Group id="formContact">
                 <Form.Label>Contact</Form.Label>
                 <Form.Control
                   type="text"
@@ -218,7 +335,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 />
                 <Form.Control.Feedback type="invalid">{errors.contact}</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formConfidentiality">
+              <Form.Group id="formConfidentiality">
                 <Form.Label>Confidentiality</Form.Label>
                 <Form.Control
                   as="select"
@@ -251,16 +368,63 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
       {checkStatus && (
         <Modal show={showModal} onHide={() => setShowModal(false)} id="customModal">
           <Modal.Header closeButton>
-            <Modal.Title>Report a Crime</Modal.Title>
+            <Modal.Title>Complaint status</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-          
+
+
+            {status.length > 0 ? (
+              <div>
+                {status.map((data) => {
+                  return (
+                    <div key={data.id} className='mt-2'>
+                      <div className="row">
+                        <div className="col-6">
+                          <h5>Complaint Code : </h5>
+                        </div>
+                        <div className="col-6">
+                        <h5>{data.complaintCode}</h5>
+
+                        </div>
+                        
+                      </div>
+                      <div className="row">
+                        <div className="col-6">
+                          <h5>Status : </h5>
+                        </div>
+                        <div className="col-6">
+                          {data.status==='Complaint registered' && (
+                        <h5 className='text-secondary'>{data.status}</h5>
+                        )}
+                        {data.status==='Under Investigation' && (
+                        <h5 className='text-danger'>{data.status}</h5>
+                        )}
+                        {data.status==='Solved' && (
+                        <h5 className='text-success'>{data.status}</h5>
+                        )}
+                        </div>
+                        
+                      </div>
+                     
+                    </div>
+                  );
+                })}
+              </div>
+            ):(
+              <div>
+                <h4 className='text-secondary'>
+                  There are no complaints registered!
+                </h4>
+              </div>
+            )}
+
+
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Close
             </Button>
-            
+
           </Modal.Footer>
           <ToastContainer />
         </Modal>

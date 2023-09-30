@@ -8,6 +8,7 @@ import Footer from './components/footer/Footer';
 import ReportCrime from './components/Report/reportCrime';
 import OfficerDashboard from './components/Dashboard/officerDashboard';
 import Reports from './components/Report/reports';
+import RegisteredFirs from './components/Report/registeredFirs';
 
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
                     <>
                       <Route path='/dashboard' element={<OfficerDashboard />} />
                       <Route path='/firs' element={<Reports />} />
+                      <Route path='/registeredFirs' element={<RegisteredFirs />} />
+
                     </>
                   )}
                   {role === "civilian" && (
