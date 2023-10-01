@@ -6,10 +6,9 @@ const Login = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(true); // New state for "Remember me" checkbox
     const [userRole, setUserRole] = useState('');
     // const [routeCategory, setRouteCategory] = useState('login-civilian')
-    var routeCategory = 'login-civilian';
+
     const history = useNavigate();
 
     const loginValidate = (e) => {
@@ -22,13 +21,9 @@ const Login = () => {
         } else {
 
             try {
-                if (userRole === "officer") { routeCategory = 'login-police' }
-                else{
-                    routeCategory = "login-civilian"
-                }
-                console.log(routeCategory)
+                
                 axios
-                    .post(`http://localhost:3001/${routeCategory}`, { email, password, rememberMe })
+                    .post(`http://localhost:3001/login`, { email, password })
                     .then((result) => {
                         console.log(result.data.user);
                         
@@ -36,12 +31,15 @@ const Login = () => {
                         localStorage.setItem('loggedUser', email);
                         localStorage.setItem('contact',result.data.user.contact)
                         localStorage.setItem('userName',result.data.user.name)
-                        localStorage.setItem('role', userRole);
+                        localStorage.setItem('role', result.data.user.role);
                         history('/dashboard')
                         window.location.reload();
                     })
                     .catch((error) => {
                         console.log(error.response.data.error);
+                        if(error.response.data.error==='User not found'){
+                            alert("User not found")
+                        }
                     });
             } catch (error) {
                 console.log("Error in loggin ", error)
@@ -75,35 +73,10 @@ const Login = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
+                            
                         </div>
-                        <div className="radio-group">
-                            <label className='mx-2'>
-                                <input
-                                    type="radio"
-                                    value="officer"
-                                    checked={userRole === 'officer'}
-                                    onChange={() => setUserRole('officer')}
-                                /> Officer
-                                 
-                            </label> 
-                            <label className='mx-2'>
-                                <input
-                                    type="radio"
-                                    value=" civilian"
-                                    checked={userRole === 'civilian'}
-                                    onChange={() => setUserRole('civilian')}
-                                /> Civilian
-                                 
-                            </label>
-                        </div>
-                        <div className="policy">
-                            <input type="checkbox" checked={rememberMe}
-                                onChange={(e) => {
-                                    setRememberMe(e.target.checked);
-                                }} />
-                            <h3>Remember me</h3>
-
-                        </div>
+                                       
+                        <p className='text-center'><Link to='/forgetpassword' className='text-decoration-none'> Forget Password ?</Link> </p>
 
                         <div className="input-box button">
                             <input type="Submit" value="Login" />

@@ -35,10 +35,6 @@ const Reports = () => {
             sortable: true
         },
         {
-            name: "Confidentiality",
-            selector: row => row.confidentiality
-        },
-        {
             name: "Investigate",
             cell: (row) => (
                 <button onClick={() => fileFIR(row)}>Investigate</button>
@@ -60,14 +56,12 @@ const Reports = () => {
         axios.get('http://localhost:3001/get-crimes')
             .then((response) => {
                 setReportData(response.data)
-                console.log(response.data, "This is the value")
             })
     }
 
 
     useEffect(() => {
         fetchData();
-        console.log(officer)
     }, [])
 
     const [filterText, setFilterText] = useState('');
@@ -103,10 +97,10 @@ const Reports = () => {
 
         axios.post('http://localhost:3001/file-fir', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, status: 'Under Investigation', firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
-                console.log(response);
+               
                 axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
                     .then((response) => {
-                        console.log(response);
+                     
                     }).catch((err) => {
                         console.log(err);
                     })
@@ -114,7 +108,7 @@ const Reports = () => {
                 console.error(error);
             });
 
-        console.log("Edit row:", row);
+       
     };
 
 
@@ -139,7 +133,6 @@ const Reports = () => {
 
         axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
-                console.log(response);
             }).catch((error) => {
                 console.error(error);
             })
@@ -163,7 +156,7 @@ const Reports = () => {
                         <div className='text-end mb-4'>
                             <input type="text" value={filterText} placeholder=' Search a crime' onChange={handleFilter} />
                         </div>
-                        {console.log(reportData)}
+                       
                         <div >
                             <DataTable id="datatable-main" columns={columns} data={filteredData} fixedHeader highlightOnHover subHeaderWrap expandOnRowClicked responsive progressComponent pagination striped />
                         </div>

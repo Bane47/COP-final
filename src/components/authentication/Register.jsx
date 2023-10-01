@@ -3,14 +3,14 @@ import axios from 'axios';
 import '../styles/register.css';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Register = () => {
+const Register = (props) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cPassword, setCpassword] = useState('');
     const [contact, setcontact] = useState('');
     const [image, setImage] = useState('');
-    const [age,setAge] = useState();
+    const [age, setAge] = useState();
     const history = useNavigate();
 
     const emailRegEx = /^[A-Za-z0-9.]+@gmail.com$/;
@@ -40,7 +40,7 @@ const Register = () => {
             alert('Password and the confirm password do not match');
         } else {
             axios
-                .post('http://localhost:3001/post-civilian', { name, age,email,contact, password, image })
+                .post('http://localhost:3001/post-account', { name, age, email, contact, password, image,category:'civilian' })
                 .then((result) => {
                     console.log(result);
                     alert('Account created successfully');
@@ -127,19 +127,20 @@ const Register = () => {
                         />
                     </div>
                     <div className='mb-2'>
-                    <input
-                        accept="image/*"
-                        type="file"
-                        placeholder="Upload Image"
-                        onChange={convertToBase64}
-                    />
-                </div>
-                   
+                        <input
+                            accept="image/*"
+                            type="file"
+                            placeholder="Upload Image"
+                            onChange={convertToBase64}
+                        />
+                    </div>
+
+
                     <div className="input-box button">
                         <input type="Submit" value="Register Now" />
                     </div>
                 </form>
-               <p>Already have an account? <Link to='/login'>Login!</Link></p>
+                <p>Already have an account? <Link to='/login'>Login!</Link></p>
             </div>
         </div>
     );

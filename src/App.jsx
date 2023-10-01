@@ -9,6 +9,8 @@ import ReportCrime from './components/Report/reportCrime';
 import OfficerDashboard from './components/Dashboard/officerDashboard';
 import Reports from './components/Report/reports';
 import RegisteredFirs from './components/Report/registeredFirs';
+import ForgotPassword from './components/forgotPassword/forgetPassword';
+import ResetPassword from './components/resetPassword/ResetPassword';
 
 
 function App() {
@@ -27,10 +29,8 @@ function App() {
               <>
                
                 <Routes>
-                  {console.log(role)}
-
-
                   <Route path='/reportCrime' element={<ReportCrime />} />
+
                   {role === 'officer' && (
                     <>
                       <Route path='/dashboard' element={<OfficerDashboard />} />
@@ -43,28 +43,20 @@ function App() {
                     <Route path='/dashboard' element={<Dashboard />} />
                   )}
 
-
-
-
-
                 </Routes>
               </>
             )
               : (<>
                 <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
                   <Routes>
+                  <Route path='/forgetpassword' element={<ForgotPassword />} />
+                  <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
+
                     <Route path='/register' element={<Register />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/dashboard' element={<Dashboard />} />
 
-                    {/* <Route path='/' element={<Home />} />
-                    <Route path='/dashboard' element={<ErrorPage />} />
-                    <Route path='/register' element={<Register />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/profile' element={<Profile />} />
-                    <Route path='/ForgotPassword' element={<ForgotPassword />} />
-                    <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
-                    <Route path='/*' element={<ErrorPage />} /> */}
+                   
 
                   </Routes>
                 </div></>)}

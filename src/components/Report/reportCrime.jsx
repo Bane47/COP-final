@@ -10,7 +10,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
   const [status, setStatus] = useState('');
   const [registeredStatus, setregisteredStatus] = useState('');
   const [solvedStatus, setSolvedStatus] = useState('');
-  const [deletedstatus,setDeletedStatus]= useState('');
+  const [deletedstatus, setDeletedStatus] = useState('');
   const [otherCrimeType, setOtherCrimeType] = useState();
   const [ComplaintCode, setComplaintCode] = useState(0);
   const [showComplaintCodeModal, setShowComplaintCodeModal] = useState(false);
@@ -202,7 +202,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
         console.log(email);
         console.log(error)
       });
-      axios.get(url4)
+    axios.get(url4)
       .then((response) => {
         setDeletedStatus(response.data);
         console.log(response.data)
@@ -418,7 +418,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Complaint Code : </h5>
                           </div>
                           <div className="col-6">
-                            <h5>{data.complaintCode}</h5>
+                            <p>{data.complaintCode}</p>
                           </div>
 
                         </div>
@@ -427,7 +427,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                              <h5 className='text-secondary'>{data.status}</h5>
+                            <p className='text-secondary'>{data.status}</p>
                           </div>
 
                         </div>
@@ -449,7 +449,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Complaint Code : </h5>
                           </div>
                           <div className="col-6">
-                            <h5 >{data.complaintCode}</h5>
+                            <p >{data.complaintCode}</p>
 
                           </div>
 
@@ -459,9 +459,12 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                           
-                              <h5 className='text-info'>{data.status}</h5>
-                           
+                            {data.status === 'Under Investigation' ? (
+                              <p className='text-info'>{data.status}</p>
+                            ) : (
+                              <p className='text-warning'>{data.status}</p>
+                            )}
+
                           </div>
 
                         </div>
@@ -477,24 +480,34 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                   {solvedStatus.map((data) => {
                     return (
                       <div key={data.id} className='mt-2'>
+
                         <div className="row">
+
                           <div className="col-6">
+
                             <h5>Complaint Code : </h5>
+
                           </div>
+
                           <div className="col-6">
-                            <h5>{data.complaintCode}</h5>
+
+                            <p>{data.complaintCode}</p>
 
                           </div>
 
                         </div>
+
                         <div className="row">
+
                           <div className="col-6">
+
                             <h5>Status : </h5>
+
                           </div>
                           <div className="col-6">
-                          
-                              <h5 className='text-success'>{data.status}</h5>
-                         
+
+                            <p className='text-success'>{data.status}</p>
+
                           </div>
 
                         </div>
@@ -505,7 +518,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                 </div>
 
               )}
-               {deletedstatus.length > 0 && (
+              {deletedstatus.length > 0 && (
                 <div>
                   {deletedstatus.map((data) => {
                     return (
@@ -515,7 +528,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Complaint Code : </h5>
                           </div>
                           <div className="col-6">
-                            <h5>{data.complaintCode}</h5>
+                            <p>{data.complaintCode}</p>
 
                           </div>
 
@@ -525,9 +538,9 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
                             <h5>Status : </h5>
                           </div>
                           <div className="col-6">
-                              <h5 className='text-danger'>{data.status}</h5>
-                       
-                          
+                            <p className='text-danger'>{data.status}</p>
+
+
                           </div>
 
                         </div>

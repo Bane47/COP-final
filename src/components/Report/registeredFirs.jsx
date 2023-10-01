@@ -57,15 +57,6 @@ const RegisteredFirs = () => {
             }
         },
         {
-            name: "Confidentiality",
-            selector: row => row.confidentiality,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
             name: "Status",
             selector: row => row.status,
             style: {
@@ -74,7 +65,6 @@ const RegisteredFirs = () => {
                 backgroundColor: 'lightblue'
             }
         },
-
         {
             name: "Update",
             cell: (row) => (
@@ -88,9 +78,9 @@ const RegisteredFirs = () => {
             }
         },
         {
-            name: "Delete",
+            name: "Pending",
             cell: (row) => (
-                <button onClick={() => handleDelete(row)} className='btn'>Pending</button>
+                <button onClick={() => handlePending(row)} className='btn'>Pending</button>
             ),
             button: true,
             style: {
@@ -172,24 +162,18 @@ const RegisteredFirs = () => {
             reportedAt,
             complaintCode
         })
-            .then((response) => {
-                
-                console.log(response);
+            .then(() => {                
+                alert('First-Information-Report filed!')
             }).catch((error) => {
                 console.log(error);
             });
 
-        // axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
-        // .then((response)=>{
-        //     console.log(response);
-        // }).catch((err)=>{
-        //     console.log(err);
-        // })
+       
         console.log("Edit row:", row);
     };
 
 
-    const handleDelete = (row) => {
+    const handlePending = (row) => {
         // Implement the logic to delete the row here
         const type = row.type;
         const dateTime = row.dateTime;
@@ -207,24 +191,14 @@ const RegisteredFirs = () => {
         const complaintCode = row.complaintCode;
         setRegistrationTime(firRegisteredAt);
 
-
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact,firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
+        
+        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact,firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
             .then((response) => {
-                console.log(response);
+                alert('Complaint added to the pending list');
             }).catch((error) => {
                 console.log(error);
             })
-        axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
-            .then((response) => {
-                console.log(response);
-                alert("Crime report is declined");
-                // window.location.reload();
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Couldn't decline the report");
-            })
-
+       
     };
 
     return (
