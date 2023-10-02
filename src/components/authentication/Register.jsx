@@ -55,17 +55,7 @@ const Register = (props) => {
         }
     };
 
-    const convertToBase64 = (e) => {
-        var reader = new FileReader();
-        reader.readAsDataURL(e.target.files[0]);
-        reader.onload = () => {
-            console.log(reader.result);
-            setImage(reader.result);
-        };
-        reader.onerror = (error) => {
-            console.log('error ', error);
-        };
-    };
+
 
     return (
         <div className="mt-5 col-6 mx-auto ">
@@ -126,15 +116,7 @@ const Register = (props) => {
                             onChange={(e) => setCpassword(e.target.value)}
                         />
                     </div>
-                    <div className='mb-2'>
-                        <input
-                            accept="image/*"
-                            type="file"
-                            placeholder="Upload Image"
-                            onChange={convertToBase64}
-                        />
-                    </div>
-
+                   
 
                     <div className="input-box button">
                         <input type="Submit" value="Register Now" />

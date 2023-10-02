@@ -1,104 +1,74 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import DataTable from 'react-data-table-component'
+import React, { useEffect, useState, useMemo } from 'react';
+import { useCallback } from 'react';
+import { MaterialReactTable } from 'material-react-table';
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    MenuItem,
+    Stack,
+    TextField,
+    Tooltip,
+} from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faProductHunt } from '@fortawesome/free-brands-svg-icons';
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import RowDetailsModal from '../model/TableModel';
+
 
 const RegisteredFirs = () => {
     const [registrationTime, setRegistrationTime] = useState(null);
-    const officer = localStorage.getItem('userName')
-    const columns = [
-        {
-            name: "Crime Type",
-            selector: row => row.type,
-            sortable: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue',
-                width: '100px'
-            }
-        },
-        {
-            name: "Description",
-            selector: row => row.description,
-            sortable: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Location",
-            selector: row => row.location,
-            sortable: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Contact",
-            selector: row => row.contact,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Date and Time",
-            selector: row => row.dateTime,
-            sortable: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Status",
-            selector: row => row.status,
-            style: {
-                color: 'green',
-                fontWeight: "bold",
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Update",
-            cell: (row) => (
-                <button onClick={() => fileFIR(row)} className='btn' >Solve</button>
-            ),
-            button: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        },
-        {
-            name: "Pending",
-            cell: (row) => (
-                <button onClick={() => handlePending(row)} className='btn'>Pending</button>
-            ),
-            button: true,
-            style: {
-                fontWeight: 'bold',
-                color: 'black',
-                backgroundColor: 'lightblue'
-            }
-        }
-    ];
-    const customStyles = {
-        head: {
-            style: {
-                backgroundColor: 'lightblue',
-                color: 'Black',
+    const officer = localStorage.getItem('userName');
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-            },
-        },
+    const handleRowClick = (row) => {
+        setSelectedRow(row);
+        setIsModalOpen(true);
     };
+
+    const closeModal = () => {
+        setSelectedRow(null);
+        setIsModalOpen(false);
+    };
+
+    const columns = useMemo(
+        () => [
+            {
+                accessorKey: 'type',
+                header: 'Crime Type',
+                size: 150,
+            },
+            {
+                accessorKey: 'description',
+                header: 'Description',
+                size: 200,
+            },
+            {
+                accessorKey: 'location',
+                header: 'Location',
+                size: 150,
+            },
+            {
+                accessorKey: 'contact',
+                header: 'Contact',
+                size: 150,
+            },
+            {
+                accessorKey: 'dateTime',
+                header: 'Date and Time',
+                size: 100,
+            }
+        ],
+        []
+    );
+
 
     const [reportData, setReportData] = useState([]);
 
@@ -106,7 +76,7 @@ const RegisteredFirs = () => {
         axios.get('http://localhost:3001/registered-firs')
             .then((response) => {
                 setReportData(response.data)
-                console.log(response.data, "This is the value")
+             
             });
     }
 
@@ -162,13 +132,24 @@ const RegisteredFirs = () => {
             reportedAt,
             complaintCode
         })
-            .then(() => {                
+            .then(() => {
                 alert('First-Information-Report filed!')
-            }).catch((error) => {
+            })
+            .then(() => {
+                axios.delete(`http://localhost:3001/delete-fir/${row._id}`)
+                    .then(() => {
+                        console.log("Complaint removed");
+                        window.location.reload();
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+            })
+            .catch((error) => {
                 console.log(error);
             });
 
-       
+
         console.log("Edit row:", row);
     };
 
@@ -191,14 +172,14 @@ const RegisteredFirs = () => {
         const complaintCode = row.complaintCode;
         setRegistrationTime(firRegisteredAt);
 
-        
-        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact,firRegisteredAt, officer, userEmail, userName, reportedAt,complaintCode })
+
+        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt, complaintCode })
             .then((response) => {
                 alert('Complaint added to the pending list');
             }).catch((error) => {
                 console.log(error);
             })
-       
+
     };
 
     return (
@@ -206,13 +187,40 @@ const RegisteredFirs = () => {
             <div className="container-fluid mt-5">
                 <div className="row" id='table-main'>
                     <div className='col-12'>
-                        <div className='text-end mb-4'>
-                            <input type="text" value={filterText} placeholder=' Search a crime' onChange={handleFilter} />
-                        </div>
+
                         <div >
-                            <DataTable id="datatable-main" columns={columns} data={filteredData} noHeader fixedHeader highlightOnHover subHeaderWrap expandOnRowClicked responsive progressComponent pagination striped customStyles={customStyles} />
-                        </div>
+                            <MaterialReactTable col displayColumnDefOptions={{
+                                'mrt-row-actions': {
+                                    muiTableHeadCellProps: {
+                                        align: 'center',
+                                    },
+                                    size: 120,
+                                },
+                            }}
+                                columns={columns}
+                                data={reportData}
+                                editingMode="modal"
+                                enableColumnOrdering
+                                enableEditing
+                                renderRowActions={({ row, table }) => (
+                                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                                        {console.log(row.original)}
+                                        <Tooltip arrow placement="left" title="Investigate">
+                                            <IconButton color='primary' onClick={() => fileFIR(row.original)}>
+                                                <FontAwesomeIcon icon={faCircleCheck} />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip arrow placement="right" title="Decline">
+                                            <IconButton color="error" onClick={() => handlePending(row.original)}>
+                                                <FontAwesomeIcon icon={faProductHunt} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                )}
+                            />                        </div>
                     </div>
+                    <RowDetailsModal selectedRow={selectedRow} onClose={closeModal} />
+
                 </div>
             </div>
         </div>

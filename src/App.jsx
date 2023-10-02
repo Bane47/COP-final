@@ -11,11 +11,14 @@ import Reports from './components/Report/reports';
 import RegisteredFirs from './components/Report/registeredFirs';
 import ForgotPassword from './components/forgotPassword/forgetPassword';
 import ResetPassword from './components/resetPassword/ResetPassword';
+import { useSelector } from 'react-redux';
 
 
 function App() {
   const isLogged = localStorage.getItem('loggedUser');
-  const role = localStorage.getItem('role')
+  const role = localStorage.getItem('role');
+  const userEmail = useSelector((state) => state.userEmail);
+console.log(userEmail)
 
   return (
     <div className="App">
@@ -51,13 +54,9 @@ function App() {
                   <Routes>
                   <Route path='/forgetpassword' element={<ForgotPassword />} />
                   <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
-
-                    <Route path='/register' element={<Register />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/dashboard' element={<Dashboard />} />
-
-                   
-
+                  <Route path='/register' element={<Register />} />
+                  <Route path='/login' element={<Login />} />
+                  <Route path='/dashboard' element={<Dashboard />} />                 
                   </Routes>
                 </div></>)}
 

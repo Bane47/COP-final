@@ -5,13 +5,14 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import ReportCrime from '../Report/reportCrime';
+import { useSelector } from 'react-redux';
+
 
 
 
 function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [checkModal,setCheckModal] = useState(false);
-
 
   return (
     <>
@@ -20,6 +21,7 @@ function Dashboard() {
 
       <div className='col-6 mx-auto mt-5 mb-5 '>
         <Card>
+          
           <Card.Body>
             <h2>Report a crime! </h2>
             <Button as="input" type="button" value="Click" onClick={() => setShowModal(true)} />
