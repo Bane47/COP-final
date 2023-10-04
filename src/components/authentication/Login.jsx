@@ -1,19 +1,23 @@
 // Login.js
 import React, { useState } from 'react';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { setUserEmail } from "../ReduxTools/counterSlice"; 
+import { setUserEmail } from "../ReduxTools/counterSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Added state for showing password
   const history = useNavigate();
   const dispatch = useDispatch();
-  const addDetail = (item)=> ({type:"role",payload:item})
+  const addDetail = (item) => ({ type: "role", payload: item })
 
-
-
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword); // Toggle showPassword state
+  };
 
   const loginValidate = (e) => {
     e.preventDefault();
@@ -27,8 +31,6 @@ const Login = () => {
         axios
           .post(`http://localhost:3001/login`, { email, password })
           .then((result) => {
-            console.log(result.data.user);
-
             alert('Logged in successfully!');
             localStorage.setItem('loggedUser', email);
             localStorage.setItem('contact', result.data.user.contact);
@@ -70,19 +72,42 @@ const Login = () => {
             </div>
             <div className="input-box">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"} // Toggle input type
                 placeholder="Enter the password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
+              
             </div>
+            <div className='row'>
+            <div className='col-6'>
+            <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="show-password-button bg-transparent border-0"
+              >
+                {showPassword ? (
+        <>
+          <FontAwesomeIcon icon={faEyeSlash} /> Hide Password
+        </>
+      ) : (
+        <>
+          <FontAwesomeIcon icon={faEye} /> Show Password
+        </>
+      )}
+              </button>
+              </div>
+              <div className='col-6'>
             <p className="text-center">
               <Link to="/forgetpassword" className="text-decoration-none">
                 {' '}
                 Forget Password ?
               </Link>{' '}
             </p>
+            </div>
+            </div>
             <div className="input-box button">
               <input type="Submit" value="Login" />
             </div>

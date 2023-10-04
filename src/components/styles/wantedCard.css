@@ -1,0 +1,9 @@
+.rounded-image {
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  
+  .rounded-image img {
+    width: 100%;
+    height: auto; /* To maintain the aspect ratio */
+  }

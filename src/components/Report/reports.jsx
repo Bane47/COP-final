@@ -4,19 +4,13 @@ import { useCallback } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import {
     Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     IconButton,
-    MenuItem,
-    Stack,
-    TextField,
     Tooltip,
 } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 import RowDetailsModal from '../model/TableModel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 
 const Reports = () => {
@@ -39,17 +33,17 @@ const Reports = () => {
     const columns = useMemo(
         () => [
             {
-                accessorKey: 'type',
+                accessorKey: 'crimeType',
                 header: 'Crime Type',
                 size: 150,
             },
             {
-                accessorKey: 'description',
+                accessorKey: 'complaintDescription',
                 header: 'Description',
                 size: 200,
             },
             {
-                accessorKey: 'location',
+                accessorKey: 'incidentLocation',
                 header: 'Location',
                 size: 150,
             },
@@ -59,8 +53,23 @@ const Reports = () => {
                 size: 150,
             },
             {
-                accessorKey: 'dateTime',
-                header: 'Date and Time',
+                accessorKey: 'incidentDate',
+                header: 'Date',
+                size: 100,
+            },
+            {
+                accessorKey: 'inspector',
+                header: 'Assigned Officer',
+                size: 100,
+            },
+            {
+                accessorKey: 'userName',
+                header: 'Complainant Name',
+                size: 100,
+            },
+            {
+                accessorKey: 'reportedAt',
+                header: 'Reported Date',
                 size: 100,
             }
         ],
@@ -84,40 +93,53 @@ const Reports = () => {
     }, [])
 
 
-
-
-    const [filterText, setFilterText] = useState('');
-    const [filteredData, setFilteredData] = useState(reportData);
-
-    const handleFilter = (event) => {
-        const inputValue = event.target.value.toLowerCase();
-        setFilterText(inputValue);
-
-        const newData = reportData.filter((row) => {
-            return row.type.toLowerCase().includes(inputValue);
-        });
-        setFilteredData(newData);
-    };
-
     const fileFIR = (row) => {
-        const type = row.type;
-        const dateTime = row.dateTime;
-        const location = row.location;
+        const crimeType = row.crimeType;
+        const complaintDescription = row.complaintDescription;
+        const incidentDate = row.incidentDate;
+        const incidentLocation = row.incidentLocation;
         const stationCode = row.stationCode;
-        const description = row.description;
-        const evidence = row.evidence;
-        const vehicles = row.vehicles;
-        const suspect = row.suspect;
+        const incidentDescription = row.incidentDescription;
+        const evidenceFile = row.evidenceFile;
+        const witnessStatement = row.witnessStatement;
+        const witnessContact = row.witnessContact;
+        const witnessAddress = row.witnessAddress;
+        const additionalDetails = row.additionalDetails;
+        const witnessName = row.witnessName;
         const contact = row.contact;
         const userEmail = row.userEmail;
-        const userName = row.userEmail;
+        const userName = row.userName;
         const reportedAt = row.reportedAt;
+        const reportedTime = row.reportedTime
+        const status = row.status;
         const complaintCode = row.complaintCode;
-
+        const inspector = row.inspector;
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
-        axios.post('http://localhost:3001/file-fir', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, status: 'Under Investigation', firRegisteredAt, officer, userEmail, userName, reportedAt, complaintCode })
+        axios.post('http://localhost:3001/file-fir', { 
+            crimeType,
+            complaintDescription,
+            incidentDate,
+            incidentLocation,
+            stationCode,
+            incidentDescription,
+            evidenceFile,
+            witnessStatement,
+            witnessContact,
+            witnessAddress,
+            additionalDetails,
+            witnessName,
+            contact,
+            userEmail,
+            userName,
+            reportedAt,
+            reportedTime,
+            status:"Under Investigation",
+            complaintCode,
+            inspector,
+            firRegisteredAt,
+         })
             .then((response) => {
 
                 axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
@@ -137,24 +159,61 @@ const Reports = () => {
     const handleDelete = (row) => {
 
         // Implement the logic to delete the row here
-        const type = row.type;
-        const dateTime = row.dateTime;
-        const location = row.location;
+        const crimeType = row.crimeType;
+        const complaintDescription = row.complaintDescription;
+        const incidentDate = row.incidentDate;
+        const incidentLocation = row.incidentLocation;
         const stationCode = row.stationCode;
-        const description = row.description;
-        const evidence = row.evidence;
-        const vehicles = row.vehicles;
-        const suspect = row.suspect;
+        const incidentDescription = row.incidentDescription;
+        const evidenceFile = row.evidenceFile;
+        const witnessStatement = row.witnessStatement;
+        const witnessContact = row.witnessContact;
+        const witnessAddress = row.witnessAddress;
+        const additionalDetails = row.additionalDetails;
+        const witnessName = row.witnessName;
         const contact = row.contact;
         const userEmail = row.userEmail;
         const userName = row.userName;
         const reportedAt = row.reportedAt;
+        const reportedTime = row.reportedTime
+        const status = row.status;
         const complaintCode = row.complaintCode;
+        const inspector = row.inspector;
         const firRegisteredAt = new Date(); // Get the current timestamp
-        setRegistrationTime(firRegisteredAt);
+        const year = firRegisteredAt.getFullYear();
+        const month = firRegisteredAt.getMonth() + 1; // Adding 1 because months are zero-based (0 = January)
+        const day = firRegisteredAt.getDate();
+        const hours = firRegisteredAt.getHours();
+        const minutes = firRegisteredAt.getMinutes();
+       
+        const dateOnly = new Date(year, month - 1, day);
 
 
-        axios.post('http://localhost:3001/post-softDelete', { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt, complaintCode })
+
+        axios.post('http://localhost:3001/post-softDelete', { 
+            crimeType,
+            complaintDescription,
+            incidentDate,
+            incidentLocation,
+            stationCode,
+            incidentDescription,
+            evidenceFile,
+            witnessStatement,
+            witnessContact,
+            witnessAddress,
+            additionalDetails,
+            witnessName,
+            contact,
+            userEmail,
+            userName,
+            reportedAt,
+            reportedTime,
+            status:"Declined",
+            complaintCode,
+            inspector,
+            firRegisteredAt,  
+            deletedTime:`Date: ${dateOnly} , Time: ${hours}:${minutes}`
+              })
             .catch((error) => {
                 console.error(error);
             })
@@ -203,8 +262,8 @@ const Reports = () => {
                                         {console.log(row.original)}
                                         <Tooltip arrow placement="left" title="Investigate">
                                             <IconButton onClick={() => fileFIR(row.original)}>
-                                                <Edit />
-                                            </IconButton>
+                                            <FontAwesomeIcon icon={faSearch} className="fa-magnifying-glass" />
+                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip arrow placement="right" title="Decline">
                                             <IconButton color="error" onClick={() => handleDelete(row.original)}>
@@ -215,7 +274,7 @@ const Reports = () => {
                                 )}
                             />
 
-<RowDetailsModal selectedRow={selectedRow} onClose={closeModal} />
+                            <RowDetailsModal selectedRow={selectedRow} onClose={closeModal} />
                         </div>
                     </div>
                 </div>

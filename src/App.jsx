@@ -12,13 +12,15 @@ import RegisteredFirs from './components/Report/registeredFirs';
 import ForgotPassword from './components/forgotPassword/forgetPassword';
 import ResetPassword from './components/resetPassword/ResetPassword';
 import { useSelector } from 'react-redux';
+import ComplainantForm from './components/multistepper/personal-details';
+import MostWanted from './components/wantedList/WantedList';
+
 
 
 function App() {
   const isLogged = localStorage.getItem('loggedUser');
   const role = localStorage.getItem('role');
-  const userEmail = useSelector((state) => state.userEmail);
-console.log(userEmail)
+  const reduxRole = useSelector((state) => state.userDetails.role);
 
   return (
     <div className="App">
@@ -30,20 +32,25 @@ console.log(userEmail)
 
             {isLogged ? (
               <>
-               
+
                 <Routes>
                   <Route path='/reportCrime' element={<ReportCrime />} />
 
-                  {role === 'officer' && (
+
+                  {role === 'officer' && reduxRole === 'officer' && (
                     <>
                       <Route path='/dashboard' element={<OfficerDashboard />} />
                       <Route path='/firs' element={<Reports />} />
                       <Route path='/registeredFirs' element={<RegisteredFirs />} />
-
                     </>
                   )}
-                  {role === "civilian" && (
-                    <Route path='/dashboard' element={<Dashboard />} />
+                  {role === "civilian" && reduxRole === 'civilian' && (
+                    <>
+                      <Route path='/ComplaintForm' element={<ComplainantForm />} />
+                      <Route path='/dashboard' element={<Dashboard />} />
+                      <Route path='/MostWanted' element={<MostWanted />} />
+
+                    </>
                   )}
 
                 </Routes>
@@ -52,11 +59,18 @@ console.log(userEmail)
               : (<>
                 <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
                   <Routes>
-                  <Route path='/forgetpassword' element={<ForgotPassword />} />
-                  <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
-                  <Route path='/register' element={<Register />} />
-                  <Route path='/login' element={<Login />} />
-                  <Route path='/dashboard' element={<Dashboard />} />                 
+
+                    <Route path='/forgetpassword' element={<ForgotPassword />} />
+
+                    <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
+
+                    <Route path='/register' element={<Register />} />
+
+                    <Route path='/login' element={<Login />} />
+
+                    <Route path='/dashboard' element={<Dashboard />} />
+                    <Route path='/MostWanted' element={<MostWanted />} />
+
                   </Routes>
                 </div></>)}
 

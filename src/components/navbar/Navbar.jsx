@@ -65,6 +65,7 @@ function MyNavbar() {
 
             {isLogged ? (
               <>
+                              <NavLink className='mx-2 text-decoration-none nav-link ' to='/MostWanted'>MostWanted</NavLink >
 
                 <NavLink className='mx-2 text-decoration-none nav-link ' onClick={handleLogout}>Logout</NavLink >
               </>

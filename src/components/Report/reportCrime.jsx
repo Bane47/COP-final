@@ -84,7 +84,7 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
     setErrors({ ...errors, [name]: '' });
   };
   const generateCode = (location, stationCode) => {
-    complaintCode = location + stationCode + Math.floor(Math.random() * 100000);
+    complaintCode = location + stationCode + Math.floor(Math.random() * 10000);
 
   }
   const handleSubmit = (e) => {
@@ -107,7 +107,6 @@ const ReportCrime = ({ showModal, setShowModal, crimeReport, checkStatus }) => {
       return;
     }
     const reportTime = new Date()
-
 
 
     axios.post('http://localhost:3001/post-crimes', {

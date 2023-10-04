@@ -38,20 +38,21 @@ const RegisteredFirs = () => {
         setIsModalOpen(false);
     };
 
+
     const columns = useMemo(
         () => [
             {
-                accessorKey: 'type',
+                accessorKey: 'crimeType',
                 header: 'Crime Type',
                 size: 150,
             },
             {
-                accessorKey: 'description',
+                accessorKey: 'complaintDescription',
                 header: 'Description',
                 size: 200,
             },
             {
-                accessorKey: 'location',
+                accessorKey: 'incidentLocation',
                 header: 'Location',
                 size: 150,
             },
@@ -61,8 +62,23 @@ const RegisteredFirs = () => {
                 size: 150,
             },
             {
-                accessorKey: 'dateTime',
-                header: 'Date and Time',
+                accessorKey: 'incidentDate',
+                header: 'Date',
+                size: 100,
+            },
+            {
+                accessorKey: 'inspector',
+                header: 'Assigned Officer',
+                size: 100,
+            },
+            {
+                accessorKey: 'userName',
+                header: 'Complainant Name',
+                size: 100,
+            },
+            {
+                accessorKey: 'reportedAt',
+                header: 'Reported Date',
                 size: 100,
             }
         ],
@@ -76,7 +92,7 @@ const RegisteredFirs = () => {
         axios.get('http://localhost:3001/registered-firs')
             .then((response) => {
                 setReportData(response.data)
-             
+
             });
     }
 
@@ -84,53 +100,59 @@ const RegisteredFirs = () => {
         fetchData();
     }, []);
 
-    const [filterText, setFilterText] = useState('');
-    const [filteredData, setFilteredData] = useState(reportData);
-
-    const handleFilter = (event) => {
-        const inputValue = event.target.value.toLowerCase();
-        setFilterText(inputValue);
-
-        const newData = reportData.filter((row) => {
-            return row.type.toLowerCase().includes(inputValue);
-        });
-        setFilteredData(newData);
-    };
-
     const fileFIR = (row) => {
-        const type = row.type;
-        const dateTime = row.dateTime;
-        const location = row.location;
+        const crimeType = row.crimeType;
+        const complaintDescription = row.complaintDescription;
+        const incidentDate = row.incidentDate;
+        const incidentLocation = row.incidentLocation;
         const stationCode = row.stationCode;
-        const description = row.description;
-        const evidence = row.evidence;
-        const vehicles = row.vehicles;
-        const suspect = row.suspect;
+        const incidentDescription = row.incidentDescription;
+        const evidenceFile = row.evidenceFile;
+        const witnessStatement = row.witnessStatement;
+        const witnessContact = row.witnessContact;
+        const witnessAddress = row.witnessAddress;
+        const additionalDetails = row.additionalDetails;
+        const witnessName = row.witnessName;
         const contact = row.contact;
         const userEmail = row.userEmail;
-        const userName = row.userEmail;
+        const userName = row.userName;
         const reportedAt = row.reportedAt;
+        const reportedTime = row.reportedTime
+        const status = row.status;
         const complaintCode = row.complaintCode;
+        const inspector = row.inspector;
         const firRegisteredAt = new Date(); // Get the current timestamp
-        setRegistrationTime(firRegisteredAt);
+        const year = firRegisteredAt.getFullYear();
+        const month = firRegisteredAt.getMonth() + 1; // Adding 1 because months are zero-based (0 = January)
+        const day = firRegisteredAt.getDate();
+        const dateOnly = new Date(year, month - 1, day);
+        const hours = firRegisteredAt.getHours();
+        const minutes = firRegisteredAt.getMinutes();
+
+
 
         axios.post(`http://localhost:3001/solve-fir`, {
-            type,
-            dateTime,
-            location,
+            crimeType,
+            complaintDescription,
+            incidentDate,
+            incidentLocation,
             stationCode,
-            description,
-            evidence,
-            vehicles,
-            suspect,
+            incidentDescription,
+            evidenceFile,
+            witnessStatement,
+            witnessContact,
+            witnessAddress,
+            additionalDetails,
+            witnessName,
             contact,
-            status: 'Solved',
-            firRegisteredAt,
-            officer,
             userEmail,
             userName,
             reportedAt,
-            complaintCode
+            reportedTime,
+            status: "Solved",
+            complaintCode,
+            inspector,
+            firRegisteredAt:`Date: ${dateOnly} , Time: ${hours}:${minutes}`,
         })
             .then(() => {
                 alert('First-Information-Report filed!')
@@ -156,24 +178,61 @@ const RegisteredFirs = () => {
 
     const handlePending = (row) => {
         // Implement the logic to delete the row here
-        const type = row.type;
-        const dateTime = row.dateTime;
-        const location = row.location;
+        const crimeType = row.crimeType;
+        const complaintDescription = row.complaintDescription;
+        const incidentDate = row.incidentDate;
+        const incidentLocation = row.incidentLocation;
         const stationCode = row.stationCode;
-        const description = row.description;
-        const evidence = row.evidence;
-        const vehicles = row.vehicles;
-        const suspect = row.suspect;
+        const incidentDescription = row.incidentDescription;
+        const evidenceFile = row.evidenceFile;
+        const witnessStatement = row.witnessStatement;
+        const witnessContact = row.witnessContact;
+        const witnessAddress = row.witnessAddress;
+        const additionalDetails = row.additionalDetails;
+        const witnessName = row.witnessName;
         const contact = row.contact;
         const userEmail = row.userEmail;
         const userName = row.userName;
         const reportedAt = row.reportedAt;
-        const firRegisteredAt = new Date(); // Get the current timestamp
+        const reportedTime = row.reportedTime
+        const status = row.status;
         const complaintCode = row.complaintCode;
-        setRegistrationTime(firRegisteredAt);
+        const inspector = row.inspector;
+        const firRegisteredAt = new Date(); // Get the current timestamp
+        const year = firRegisteredAt.getFullYear();
+        const month = firRegisteredAt.getMonth() + 1; // Adding 1 because months are zero-based (0 = January)
+        const day = firRegisteredAt.getDate();
+        const hours = firRegisteredAt.getHours();
+        const minutes = firRegisteredAt.getMinutes();
+       
+
+        const dateOnly = new Date(year, month - 1, day);
+        setRegistrationTime(hours+":"+minutes);
 
 
-        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { type, dateTime, location, stationCode, description, evidence, vehicles, suspect, contact, firRegisteredAt, officer, userEmail, userName, reportedAt, complaintCode })
+        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { 
+            crimeType,
+            complaintDescription,
+            incidentDate,
+            incidentLocation,
+            stationCode,
+            incidentDescription,
+            evidenceFile,
+            witnessStatement,
+            witnessContact,
+            witnessAddress,
+            additionalDetails,
+            witnessName,
+            contact,
+            userEmail,
+            userName,
+            reportedAt,
+            reportedTime,
+            status:"Pending",
+            complaintCode,
+            inspector,
+            firRegisteredAt:`Date: ${dateOnly} , Time: ${hours}:${minutes}`,          
+            })
             .then((response) => {
                 alert('Complaint added to the pending list');
             }).catch((error) => {
