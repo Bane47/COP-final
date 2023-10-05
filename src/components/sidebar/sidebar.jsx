@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/sidebar.css'
+import { Link } from 'react-router-dom';
 const Sidebar = () => {
   return (
     <div className='sidebar'>
@@ -11,16 +12,9 @@ const Sidebar = () => {
     <hr/>
   </div>
   <div id="nav-content">
-    <div class="nav-button"><i class="fas fa-palette"></i><span>Your Work</span></div>
-    <div class="nav-button"><i class="fas fa-images"></i><span>Assets</span></div>
-    <div class="nav-button"><i class="fas fa-thumbtack"></i><span>Pinned Items</span></div>
-    <hr/>
-    <div class="nav-button"><i class="fas fa-heart"></i><span>Following</span></div>
-    <div class="nav-button"><i class="fas fa-chart-line"></i><span>Trending</span></div>
-    <div class="nav-button"><i class="fas fa-fire"></i><span>Challenges</span></div>
-    <div class="nav-button"><i class="fas fa-magic"></i><span>Spark</span></div>
-    <hr/>
-    <div class="nav-button"><i class="fas fa-gem"></i><span>Codepen Pro</span></div>
+    <div class="nav-button"><i class="fas fa-palette"></i><span>
+      <Link to='/register-police'>Police Registration</Link></span></div>
+
     <div id="nav-content-highlight"></div>
   </div>
   <input id="nav-footer-toggle" type="checkbox"/>

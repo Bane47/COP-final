@@ -49,15 +49,15 @@ function MyNavbar() {
 
           </Nav>
           <Nav>
-            {userRole === "officer" ? (
+            {userRole === "Admin" ? (
               <>
-
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/register-police">Register Police</NavLink >
                 <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Dashboard</NavLink >
               </>
             ) : (
               <>
 
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Dashboard</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/civilian-dashboard">Dashboard</NavLink >
 
               </>
             )}
@@ -65,8 +65,7 @@ function MyNavbar() {
 
             {isLogged ? (
               <>
-                              <NavLink className='mx-2 text-decoration-none nav-link ' to='/MostWanted'>MostWanted</NavLink >
-
+                {/* <NavLink className='mx-2 text-decoration-none nav-link ' to='/MostWanted'>MostWanted</NavLink > */}
                 <NavLink className='mx-2 text-decoration-none nav-link ' onClick={handleLogout}>Logout</NavLink >
               </>
             ) : (

@@ -5,9 +5,7 @@ body {
     margin: 0px;
     padding: 0px;
     overflow-x: hidden;
-    background-color: #F5ECD7 !important;
-  
-
+    background-color: white !important;
 }
 
 .nav-item {
@@ -15,7 +13,6 @@ body {
     font-weight: bolder;
     font-size: larger;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
 }
 
 .nav-item:hover {

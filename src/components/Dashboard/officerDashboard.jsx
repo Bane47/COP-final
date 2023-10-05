@@ -47,8 +47,8 @@ const OfficerDashboard = () => {
         </>
       ) : (
         <>
-          <div className='mt-5'>
-            <Card>
+          <div className='my-5 shadow-lg '>
+            <Card className='border-0'>
               <Card.Body>
                 <h2>Look at the crime reports!</h2>
                 <Link to='/firs'>
@@ -58,8 +58,8 @@ const OfficerDashboard = () => {
             </Card>
           </div>
 
-          <div className='mt-5'>
-            <Card>
+          <div className='my-5 shadow-lg'>
+            <Card className='border-0'>
               <Card.Body>
                 <h2>Look at the overall FIRs!</h2>
                 <Link to='/registeredFirs'>

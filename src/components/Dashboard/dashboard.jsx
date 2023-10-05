@@ -37,7 +37,7 @@ function Dashboard() {
         </div>
       ) : (
         <>
-        <img src={mainImage} alt="" />
+        <img src={mainImage}  alt="" />
      
 
       <div className='col-6 mx-auto mt-5 mb-5 '>

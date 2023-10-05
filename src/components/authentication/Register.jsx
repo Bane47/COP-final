@@ -11,6 +11,7 @@ const Register = (props) => {
     const [contact, setcontact] = useState('');
     const [image, setImage] = useState('');
     const [age, setAge] = useState();
+    const [id,setId] = useState();
     const history = useNavigate();
 
     const emailRegEx = /^[A-Za-z0-9.]+@gmail.com$/;
@@ -19,7 +20,7 @@ const Register = (props) => {
 
     const registerValidate = (e) => {
         e.preventDefault();
-
+        setId(name[0]+name[1]+name[2]+(Math.floor(Math.random() * 10000) + 1))
         if (name === '') {
             alert('Please enter the name');
         } else if (email === '') {
@@ -40,7 +41,7 @@ const Register = (props) => {
             alert('Password and the confirm password do not match');
         } else {
             axios
-                .post('http://localhost:3001/post-account', { name, age, email, contact, password, image,category:'civilian' })
+                .post('http://localhost:3001/post-account', { name, age, email, contact, password, image,category:'civilian',id })
                 .then((result) => {
                     console.log(result);
                     alert('Account created successfully');
