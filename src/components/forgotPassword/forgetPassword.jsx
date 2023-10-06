@@ -13,10 +13,10 @@ const ForgotPassword = () => {
     })
     .then((response)=>{
       console.log(response)
-      toast.success("Email sent to your mail ID!")
+      alert("Email sent to your mail ID!")
     }).catch((error)=>{
       console.log(error);
-      toast.error("User not found!")
+
     })
   }
 

@@ -10,7 +10,7 @@ import axios from 'axios';
 function MyNavbar() {
   const isLogged = localStorage.getItem('loggedUser');
   const userRole = localStorage.getItem('role');
-  const [data,setData]= useState();
+  const [data, setData] = useState();
   const history = useNavigate();
 
   const handleLogout = () => {
@@ -20,8 +20,8 @@ function MyNavbar() {
     history('/login');
     window.location.reload();
   }
-  const fetchData=()=>{
-    
+  const fetchData = () => {
+
     // axios.get(`http://localhost:3001/get-profile?email=${isLogged}`)
     // .then((res)=>{
     //   setData(res.data);
@@ -32,9 +32,9 @@ function MyNavbar() {
     // })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchData();
-  },[isLogged])
+  }, [isLogged])
 
 
   return (
@@ -45,20 +45,27 @@ function MyNavbar() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-
-
           </Nav>
           <Nav>
-            {userRole === "Admin" ? (
+            {userRole === "civilian" && (
+              <>
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/civilian-dashboard">Explore</NavLink >
+              </>
+            )}
+            {userRole === "Admin" && (
               <>
                 <NavLink className='mx-2 text-decoration-none nav-link' to="/register-police">Register Police</NavLink >
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Dashboard</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Home</NavLink >
               </>
-            ) : (
+            )}
+            {userRole === "Inspector" && (
               <>
-
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/civilian-dashboard">Dashboard</NavLink >
-
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/inspector-Dashboard">Explore</NavLink >
+              </>
+            )}
+            {userRole === "Sub-Inspector" && (
+              <>
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Explore</NavLink >
               </>
             )}
 
@@ -70,11 +77,12 @@ function MyNavbar() {
               </>
             ) : (
               <>
+                <NavLink className='mx-2 text-decoration-none nav-link' to="/">Explore</NavLink >
                 <NavLink className='mx-2 text-decoration-none nav-link' to="/register">Register</NavLink >
                 <NavLink className='mx-2 text-decoration-none nav-link' to="/login">Login</NavLink >
               </>
             )}
-{/* <img src={`http://localhost:3001/images/${data.image}`}
+            {/* <img src={`http://localhost:3001/images/${data.image}`}
                 className="rounded-circle mt-2 me-2 ms-3 "
                 id="avatar"
                 alt="Avatar"

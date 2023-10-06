@@ -36,7 +36,6 @@ const ComplainantForm = () => {
     const [crimeTypes, setCrimeTypes] = useState([]);
 
     const handleNext = () => {
-
         setStep(step + 1);
     };
 
@@ -60,8 +59,6 @@ const ComplainantForm = () => {
     // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
-        // generateCode(complainantData,)
-        // You can perform validation here before sending the data to the server
         const complainantData = { ...formData };
         generateCode(formData.incidentLocation, formData.stationCode)
         // You can now send the complainantData to your server/API
@@ -90,7 +87,7 @@ const ComplainantForm = () => {
             contact: userDetails.contact,
             userEmail: userDetails.email,
             userName: userDetails.name,
-            reportedAt: dateOnly,
+            reportedAt: `${day}-${month}-${year}`,
             reportedTime: `${hours}:${minutes}`,
             status: 'Complaint Registered',
             complaintCode,
@@ -98,8 +95,7 @@ const ComplainantForm = () => {
         })
             .then(() => {
                 setShowModal(true);
-                setComplaintCode(complaintCode);
-                
+                setComplaintCode(complaintCode);                
             })
             .catch((error) => {
                 console.log(error)
@@ -394,7 +390,7 @@ const ComplainantForm = () => {
                     {showModal && (
                         <ComplaintCodeModal
                             show={showModal}
-                            onHide={() => {setShowModal(false);history('/dashboard');}} // Function to hide the modal
+                            onHide={() => {setShowModal(false);history('/civilian-dashboard');}} // Function to hide the modal
                             complaintCode={compCode}
                         />
                     )}

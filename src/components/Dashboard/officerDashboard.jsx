@@ -68,6 +68,17 @@ const OfficerDashboard = () => {
               </Card.Body>
             </Card>
           </div>
+
+          <div className='my-5 shadow-lg'>
+            <Card className='border-0'>
+              <Card.Body>
+                <h2>Updates from the police stations</h2>
+                <Link to='/updates'>
+                  <Button>Click</Button>
+                </Link>
+              </Card.Body>
+            </Card>
+          </div>
         </>
       )}
     </div>

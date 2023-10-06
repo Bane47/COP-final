@@ -37,11 +37,11 @@ function Dashboard() {
         </div>
       ) : (
         <>
-        <img src={mainImage}  alt="" />
+        <img src={mainImage} className='img-fluid'  alt="" />
      
 
       <div className='col-6 mx-auto mt-5 mb-5 '>
-        <Card>
+        <Card className='border-0 shadow-lg'>
           <Card.Body>
             <h2>Report a crime! </h2>
             <Link to='/ComplaintForm'>
@@ -49,15 +49,10 @@ function Dashboard() {
             </Link>
           </Card.Body>
         </Card>
-
-        {/* Render the ReportCrime component based on showModal */}
-        {showModal && (
-          <ReportCrime crimeReport='true' showModal={showModal} setShowModal={setShowModal} />
-        )}
       </div>
 
       <div className='col-6 mx-auto mt-5 mb-5'>
-        <Card>
+        <Card className='border-0 shadow-lg'>
           <Card.Body>
             <h2>Check the status </h2>
             <Button as="input" type="button" value="Click" onClick={() => setCheckModal(true)} />

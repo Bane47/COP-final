@@ -13,7 +13,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false); // Added state for showing password
   const history = useNavigate();
   const dispatch = useDispatch();
-  const addDetail = (item) => ({ type: "role", payload: item })
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword); // Toggle showPassword state
@@ -21,7 +20,6 @@ const Login = () => {
 
   const loginValidate = (e) => {
     e.preventDefault();
-
     if (email === '') {
       alert('Please enter the email id');
     } else if (password === '') {
@@ -35,11 +33,9 @@ const Login = () => {
             localStorage.setItem('loggedUser', email);
             localStorage.setItem('contact', result.data.user.contact);
             localStorage.setItem('userName', result.data.user.name);
-            localStorage.setItem('role', result.data.user.role);
-
+            localStorage.setItem('role', result.data.user.role);         
             // Dispatch action to update Redux store
             dispatch(setUserEmail(result.data.user));
-
             history('/dashboard');
             window.location.reload();
           })
@@ -56,8 +52,8 @@ const Login = () => {
   };
 
   return (
-    <div className="mt-5">
-      <div className="justify-content-center mt-5">
+    <div>
+      <div className="justify-content-center ">
         <div className="wrapper row col-6 mx-auto">
           <h2>Login</h2>
           <form onSubmit={loginValidate}>
@@ -79,34 +75,34 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
 
-              
+
             </div>
             <div className='row'>
-            <div className='col-6'>
-            <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="show-password-button bg-transparent border-0"
-              >
-                {showPassword ? (
-        <>
-          <FontAwesomeIcon icon={faEyeSlash} /> Hide Password
-        </>
-      ) : (
-        <>
-          <FontAwesomeIcon icon={faEye} /> Show Password
-        </>
-      )}
-              </button>
+              <div className='col-6'>
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="show-password-button bg-transparent border-0"
+                >
+                  {showPassword ? (
+                    <>
+                      <FontAwesomeIcon icon={faEyeSlash} /> Hide Password
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faEye} /> Show Password
+                    </>
+                  )}
+                </button>
               </div>
               <div className='col-6'>
-            <p className="text-center">
-              <Link to="/forgetpassword" className="text-decoration-none">
-                {' '}
-                Forget Password ?
-              </Link>{' '}
-            </p>
-            </div>
+                <p className="text-center">
+                  <Link to="/forgetpassword" className="text-decoration-none">
+                    {' '}
+                    Forget Password ?
+                  </Link>{' '}
+                </p>
+              </div>
             </div>
             <div className="input-box button">
               <input type="Submit" value="Login" />

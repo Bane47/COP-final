@@ -15,10 +15,10 @@ import {
 import { Delete, Edit } from '@mui/icons-material';
 import RowDetailsModal from '../model/TableModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 
-const Reports = () => {
+const InspectorComplaints = () => {
     const [registrationTime, setRegistrationTime] = useState(null);
     const officer = localStorage.getItem('userName');
     const [selectedRow, setSelectedRow] = useState(null);
@@ -26,9 +26,8 @@ const Reports = () => {
     const [reportData, setReportData] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowData, setRowData] = useState({});
-    const [formData,setFormData] = useState();
-    const [secondDialogOpen,setSecondDialogOpen]=useState(false);
-
+    const officerEmail = localStorage.getItem('userName');
+    var firCode ;
 
 
     const handleRowClick = (row) => {
@@ -49,17 +48,10 @@ const Reports = () => {
     const closeDialog = () => {
         setDialogOpen(false);
     };
-    const openSecondDialog = () => {
-        setSecondDialogOpen(true);
-    };
 
-    const closeSecondDialog = () => {
-        setSecondDialogOpen(false);
-    };
-
-
-
-
+    const firCodeGenerator=(crimeType,incidentDate,incidentLocation,stationCode,complaintCode)=>{
+        firCode = (crimeType[0]+crimeType[1]+incidentDate[0]+incidentDate[1]+incidentLocation[0]+incidentLocation[1]+stationCode+complaintCode[0]+complaintCode[1]+complaintCode[2]+(Math.floor((Math.random()*1000)+1)))
+    }
 
     const columns = useMemo(
         () => [
@@ -108,7 +100,8 @@ const Reports = () => {
         const firRegisteredAt = new Date(); // Get the current timestamp
         setRegistrationTime(firRegisteredAt);
 
-        axios.post('http://localhost:3001/admin-to-inspector', {
+
+        axios.post('http://localhost:3001/file-fir', {
             crimeType,
             complaintDescription,
             incidentDate,
@@ -126,27 +119,25 @@ const Reports = () => {
             userName,
             reportedAt,
             reportedTime,
-            status: "Under Investigation",
+            status: "First Information Report filed",
             complaintCode,
             inspector,
+            firCode,
             firRegisteredAt,
         })
-            // .then(() => {
-            //     axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
-            //     .then(()=>{
-            //         alert("Complaint sent to the Police station");
-            //     })
-            //         .catch((err) => {
-            //             console.log(err);
-            //         })
-            // })
             .then(() => {
-                alert("Report sent to the police station")
+                // axios.delete(`http://localhost:3001/admin-to-inspector/${row._id}`)
+                // .catch((err) => {
+                //         console.log(err);
+                // });
+            })
+            .then(() => {
+                alert("First Information Report filed!");
+                window.location.reload();
             })
             .catch((error) => {
                 console.error(error);
             });
-
     };
 
     const deleteCrimeReport = (row) => {
@@ -180,7 +171,9 @@ const Reports = () => {
 
         const dateOnly = new Date(year, month - 1, day);
 
-        axios.post('http://localhost:3001/post-softDelete', {
+
+
+        axios.post(`http://localhost:3001/pending-fir/${row._id}`, {
             crimeType,
             complaintDescription,
             incidentDate,
@@ -198,25 +191,16 @@ const Reports = () => {
             userName,
             reportedAt,
             reportedTime,
-            status: "Declined",
+            status: "Pending",
             complaintCode,
             inspector,
             firRegisteredAt,
             deletedTime: `Date: ${dateOnly} , Time: ${hours}:${minutes}`
         })
-            .catch((error) => {
+        .catch((error) => {
                 console.error(error);
             })
-        axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
-            .then((response) => {
-                alert("Crime report is declined ", row._id);
-                window.location.reload();
-            })
-            .catch((error) => {
-                console.error(error);
 
-                alert("Couldn't decline the report")
-            })
         const updatedData = reportData.filter((item) => item._id !== row._id);
         setReportData(updatedData);
         closeDialog();
@@ -224,25 +208,34 @@ const Reports = () => {
 
 
 
-    const fetchData = async() => {
-        axios.get('http://localhost:3001/get-crimes')
-            .then((response) => {
-                setReportData(response.data)
+
+    const fetchData = () => {
+        axios.get(`http://localhost:3001/get-zones-email/${officerEmail}`)
+        .then((response) => {
+            console.log(response.data)
+            axios.get(`http://localhost:3001/admin-to-inspector/${response.data.stationCode}`)
+            .then((response)=>{
+                setReportData(response.data);
+                console.log(response.data)
             })
-
-        try {
-            const response = await axios.get('http://localhost:3001/progress-updates');
-            setFormData(response.data[0]);
-        } catch (error) {
-            console.error(error);
-        }
-
+        })
+        .catch((error) => {
+            console.log(error)
+        });
     }
 
 
     useEffect(() => {
         fetchData();
     }, [])
+
+
+
+
+
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [tableData, setTableData] = useState(() => reportData);
+    const [validationErrors, setValidationErrors] = useState({});
 
 
     return (
@@ -267,17 +260,12 @@ const Reports = () => {
                                 editingMode="modal"
                                 enableColumnOrdering
                                 enableEditing
-                                positionActionsColumn="last"
+
                                 renderRowActions={({ row, table }) => (
                                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                                         <Tooltip arrow placement="left" title="View">
                                             <IconButton onClick={() => openDialog(row.original)}>
                                                 <FontAwesomeIcon icon={faSearch} className="fa-magnifying-glass" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip arrow placement="left" title="Updates">
-                                            <IconButton onClick={() => openSecondDialog()}>
-                                                <FontAwesomeIcon icon={faEdit} className="fa-edit" />
                                             </IconButton>
                                         </Tooltip>
                                     </Box>
@@ -338,37 +326,8 @@ const Reports = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            <Dialog open={secondDialogOpen} onClose={closeSecondDialog}>
-                <DialogTitle>Update</DialogTitle>
-                <DialogContent>
-                    <DialogContent>
-                        <ul className='list-unstyled p-2'>
-                            <li className='text-center'><b>Complaint Status Update</b></li>
-                            {formData ? (
-                                <>{console.log(formData)}
-                                    <li><b>Progress</b>: {formData.progress}</li>
-                                    <li><b>Status</b>: {formData.status}</li>
-                                    <li><b>Officer Name</b>: {formData.officerName}</li>
-                                    <li><b>Complainant Email</b>: {formData.email}</li>
-                                    <li><b>Name</b>: {formData.name}</li>
-                                    <li><b>Officer Number</b>: {formData.officerNumber}</li>
-                                </>
-                            ) : (
-                                <li className='text-center'>No updates yet</li>
-                            )}
-                        </ul>
-                    </DialogContent>
-
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={closeSecondDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 };
 
-export default Reports;
+export default InspectorComplaints;

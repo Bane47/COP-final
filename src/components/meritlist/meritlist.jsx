@@ -22,6 +22,8 @@ const MeritList = () => {
     const [products, setProducts] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
     const [rowData, setRowData] = useState({});
+    const [inspector, setInspector] = useState();
+    const [area, setArea] = useState();
 
     const generateRandomPassword = (length) => {
         const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=<>?";
@@ -99,8 +101,7 @@ const MeritList = () => {
         handleGeneratePassword();
 
         try {
-            console.log(data.applicationDate)
-            axios.post('http://localhost:3001/post-inspector', {
+            axios.post('http://localhost:3001/post-inspector', {    //Posting the inspector
                 id: data.roll,
                 name: data.name,
                 email: data.email,
@@ -114,24 +115,44 @@ const MeritList = () => {
                 password
             })
                 .then(() => {
-                    axios.post('http://localhost:3001/post-main-model', {
+                    axios.post('http://localhost:3001/post-main-model', {  //Posting into main for login
                         name: data.name,
                         email: data.email,
                         contact: data.contact,
                         category: data.category,
                         password
                     })
-                    .catch((error)=>{
-                        alert("Problem with creating account in main");
-                        console.log(error)
+                        .catch((error) => {
+                            alert("Problem with creating account in main");
+                            console.log(error)
+                        })
+
+                })
+                .then(() => {
+            axios.get(`http://localhost:3001/get-zones-code/${data.stationDetails}`)    //get station details to transfer the existing inspector
+                .then((response) => {
+                    axios.put(`http://localhost:3001/transfer-inspector/${data.stationDetails}`, {  //transfer existing officer
+                        stationCode: data.stationDetails,
+                        inspector:data.name,
+                        area:response.data.area,
+                        email:data.email
                     })
+                    .then(()=>{
+                        alert("Success")
+                    })
+                        .catch((error) => {
+                            console.log(error);
+                        })
+                })
 
-
-                    axios.delete(`http://localhost:3001/delete-application/${data._id}`)
+                    
+                })
+                .then(() => {
+                    axios.delete(`http://localhost:3001/delete-application/${data._id}`)        //Deleting the officer from application list
                         .catch((error) => {
                             console.log(error)
                         })
-                    axios.post('http://localhost:3001/send-email-credentials', {
+                    axios.post('http://localhost:3001/send-email-credentials', {        //sending email
                         email: data.email,
                         password
                     })
@@ -142,7 +163,6 @@ const MeritList = () => {
                         .catch(() => {
                             alert("Problem in sending email!")
                         })
-
                 })
                 .catch((error) => {
                     alert('Could not add account');
@@ -181,7 +201,7 @@ const MeritList = () => {
                     enableEditing
                     renderRowActions={({ row, table }) => (
                         <Box sx={{ display: 'flex', gap: '1rem' }}>
-                            <Tooltip arrow placement="right" title="Investigate">
+                            <Tooltip arrow placement="right" title="View">
                                 <IconButton color='primary' onClick={() => handleButtonClick(row)}>
                                     <FontAwesomeIcon icon={faExpand} />
                                 </IconButton>
@@ -190,7 +210,6 @@ const MeritList = () => {
                     )}
                 />
             </div>
-
             <Dialog
                 open={openDialog}
                 onClose={() => setOpenDialog(false)}

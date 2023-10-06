@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MyNavbar from './components/navbar/Navbar';
 import Register from './components/authentication/Register';
 import Login from './components/authentication/Login';
-import Dashboard from './components/Dashboard/dashboard';
+import Dashboard from './components/Dashboard/CivilianDashboard';
 import Footer from './components/footer/Footer';
 import ReportCrime from './components/Report/reportCrime';
 import OfficerDashboard from './components/Dashboard/officerDashboard';
@@ -19,6 +19,9 @@ import Sidebar from './components/sidebar/sidebar';
 import MeritList from './components/meritlist/meritlist';
 import SubInspectorDashboard from './components/Dashboard/SubInspector';
 import InspectorDashboard from './components/Dashboard/InspectorDashboard';
+import HomeDashboard from './components/Dashboard/HomeDashboard';
+import InspectorComplaints from './components/Inspector/InspectorComplaints';
+import FIR from './components/Inspector/FIR';
 
 
 
@@ -32,22 +35,34 @@ function App() {
       <BrowserRouter>
 
         <MyNavbar />
-        <div className="container">
+        <div className="container mt-3">
           <div className='row' id='main-app'>
             <div className='col-3'>
               <Sidebar />
             </div>
             <div className='col-9 mt-5'>
               {isLogged ? (
-                <>
-
+              <>
                   <Routes>
-                    <Route path='/reportCrime' element={<ReportCrime />} />
+                    <Route path='/' element={<HomeDashboard />} />
+                    {role === "Admin" && reduxRole === 'Admin' && (
+                      <>
+                        <Route path='/register-police' element={<MeritList />} />
+                        <Route path='/firs' element={<Reports />} />
+                        <Route path='/registeredFirs' element={<RegisteredFirs />} />
+                        <Route path='/ComplaintForm' element={<ComplainantForm />} />
+                        <Route path='/dashboard' element={<OfficerDashboard />} />
+                        <Route path='/MostWanted' element={<MostWanted />} />
+                        <Route path='/updates' element={<MostWanted />} />
 
-
+                      </>
+                    )}
                     {role === 'Inspector' && reduxRole === 'Inspector' && (
                       <>
                         <Route path='/inspector-Dashboard' element={<InspectorDashboard />} />
+                        <Route path='/InspectorComplaints' element={<InspectorComplaints />} />
+                        <Route path='/Fir' element={<FIR />} />
+
                       </>
                     )}
                     {role === "civilian" && reduxRole === 'civilian' && (
@@ -58,56 +73,33 @@ function App() {
 
                       </>
                     )}
-                       {role === "Admin" && reduxRole === 'Admin' && (
-                      <>
-                       <Route path='/register-police' element={<MeritList />} />
-                        <Route path='/firs' element={<Reports />} />
-                        <Route path='/registeredFirs' element={<RegisteredFirs />} />
-                        <Route path='/ComplaintForm' element={<ComplainantForm />} />
-                        <Route path='/dashboard' element={<OfficerDashboard />} />
-                        <Route path='/MostWanted' element={<MostWanted />} />
-
-                      </>
-                    )}
-                       {role === "Sub-Inspector" && reduxRole === 'Sub-Inspector' && (
+                    {role === "Sub-Inspector" && reduxRole === 'Sub-Inspector' && (
                       <>
                         <Route path='/dashboard' element={<Dashboard />} />
                         <Route path='/MostWanted' element={<MostWanted />} />
                         <Route path='/sub-inspector-dashboard' element={<SubInspectorDashboard />} />
-
                       </>
                     )}
-
                   </Routes>
                 </>
               ) : (
                 <>
                   <div className='col-12 col-sm-12 mt-5 pt-5 min-vh-100 overflow-hidden '>
                     <Routes>
-
+                      <Route path='/' element={<HomeDashboard />} />
                       <Route path='/forgetpassword' element={<ForgotPassword />} />
-
                       <Route path='/password-reset/:id/:token' element={<ResetPassword />} />
-
                       <Route path='/register' element={<Register />} />
-
                       <Route path='/login' element={<Login />} />
-
-                      <Route path='/dashboard' element={<Dashboard />} />
                       <Route path='/MostWanted' element={<MostWanted />} />
-
                     </Routes>
                   </div>
                 </>
               )}
             </div>
-
-
-          </div></div>
-
-
+          </div>
+        </div>
       </BrowserRouter>
-
     </div>
   );
 }
