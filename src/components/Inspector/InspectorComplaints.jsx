@@ -50,7 +50,7 @@ const InspectorComplaints = () => {
     };
 
     const firCodeGenerator=(crimeType,incidentDate,incidentLocation,stationCode,complaintCode)=>{
-        firCode = (crimeType[0]+crimeType[1]+incidentDate[0]+incidentDate[1]+incidentLocation[0]+incidentLocation[1]+stationCode+complaintCode[0]+complaintCode[1]+complaintCode[2]+(Math.floor((Math.random()*1000)+1)))
+        return (crimeType[0]+crimeType[1]+incidentDate[0]+incidentDate[1]+incidentLocation[0]+incidentLocation[1]+stationCode+complaintCode[0]+complaintCode[1]+complaintCode[2]+(Math.floor((Math.random()*1000)+1)))
     }
 
     const columns = useMemo(
@@ -69,6 +69,11 @@ const InspectorComplaints = () => {
             {
                 accessorKey: 'incidentDate',
                 header: 'Date',
+                size: 100,
+            },
+            {
+                accessorKey: 'status',
+                header: 'Status',
                 size: 100,
             }
 
@@ -122,14 +127,14 @@ const InspectorComplaints = () => {
             status: "First Information Report filed",
             complaintCode,
             inspector,
-            firCode,
+            firCode:firCodeGenerator(crimeType,incidentDate,incidentLocation,stationCode,complaintCode),
             firRegisteredAt,
         })
             .then(() => {
-                // axios.delete(`http://localhost:3001/admin-to-inspector/${row._id}`)
-                // .catch((err) => {
-                //         console.log(err);
-                // });
+                axios.delete(`http://localhost:3001/admin-to-inspector/${row._id}`)
+                .catch((err) => {
+                        console.log(err);
+                });
             })
             .then(() => {
                 alert("First Information Report filed!");
@@ -240,7 +245,9 @@ const InspectorComplaints = () => {
 
     return (
         <div>
+
             <div className="container-fluid mt-5">
+                <h2>Reports from the control room</h2>
                 <div className="row" id="table-main">
                     <div className="col-12">
                         <div>
@@ -288,8 +295,8 @@ const InspectorComplaints = () => {
                             <li><b>Location</b>: {rowData.incidentLocation}</li>
                             <li><b>Incident Description</b>: {rowData.incidentDescription}</li>
                             <li><b>Station Code</b>: {rowData.stationCode}</li>
-                            <li><b>Evidence</b>: {rowData.evidenceFile}</li>
                             <li><b>Additional Details</b>:{rowData.additionalDetails}</li>
+                            <li><b>Status</b>: {rowData.status}</li>
 
                             {!rowData.witnessName ? (
                                 <>
@@ -319,10 +326,10 @@ const InspectorComplaints = () => {
                         Close
                     </Button>
                     <Button onClick={() => investigateCrime(rowData)} color="primary">
-                        Investigate
+                        File FIR
                     </Button>
                     <Button onClick={() => deleteCrimeReport(rowData)} color="secondary">
-                        Decline
+                        Add to pending
                     </Button>
                 </DialogActions>
             </Dialog>

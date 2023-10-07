@@ -41,7 +41,7 @@ function Dashboard() {
      
 
       <div className='col-6 mx-auto mt-5 mb-5 '>
-        <Card className='border-0 shadow-lg'>
+        <Card className='border-0 shadow-lg crime-card'>
           <Card.Body>
             <h2>Report a crime! </h2>
             <Link to='/ComplaintForm'>
@@ -52,7 +52,7 @@ function Dashboard() {
       </div>
 
       <div className='col-6 mx-auto mt-5 mb-5'>
-        <Card className='border-0 shadow-lg'>
+        <Card className='border-0 shadow-lg crime-card'>
           <Card.Body>
             <h2>Check the status </h2>
             <Button as="input" type="button" value="Click" onClick={() => setCheckModal(true)} />

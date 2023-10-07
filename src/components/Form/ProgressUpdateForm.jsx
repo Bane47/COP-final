@@ -12,14 +12,13 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-const ProgressUpdateForm = ({ onSubmit, email, name }) => {
+const ProgressUpdateForm = ({ onSubmit, email, name , firCode, compCode}) => {
 
     const officerName = localStorage.getItem('userName');
     const officerNumber = localStorage.getItem('contact')
     // Define state variables for form fields
     const [progress, setProgress] = useState('');
     const [status, setStatus] = useState('In Progress');
-    const history = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -29,7 +28,9 @@ const ProgressUpdateForm = ({ onSubmit, email, name }) => {
             progress,
             status,
             officerName,
-            name
+            name,
+            firCode,
+            compCode
         };
 
         // Pass the form data to the parent component's onSubmit function
@@ -45,9 +46,11 @@ const ProgressUpdateForm = ({ onSubmit, email, name }) => {
             status,
             officerName,
             officerNumber,
-            name
+            name,
+            firCode,
+            compCode
         })
-            .then(() => {
+         .then(() => {
                 alert('Update sent!');
                 window.location.reload();
             })

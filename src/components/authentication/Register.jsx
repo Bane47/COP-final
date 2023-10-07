@@ -59,7 +59,7 @@ const Register = (props) => {
 
 
     return (
-        <div className="mt-5 col-6 mx-auto ">
+        <div className="mt-5 col-md-6 mx-auto ">
             <div className="wrapper row  mt-5 register-form">
                 <h2>Registration</h2>
                 <form onSubmit={registerValidate}>

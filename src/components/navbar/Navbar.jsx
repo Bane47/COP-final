@@ -7,6 +7,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import logo from '../assets/Logo.png'
 function MyNavbar() {
   const isLogged = localStorage.getItem('loggedUser');
   const userRole = localStorage.getItem('role');
@@ -39,33 +40,34 @@ function MyNavbar() {
 
   return (
 
-    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" fixed="top">
+    <Navbar collapseOnSelect expand="lg" className='navbar-color' fixed="top">
       <Container>
-        <Navbar.Brand >COP</Navbar.Brand>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+      <NavLink className='mx-2 text-decoration-none nav-link nav-txt '><img src={logo} className='logo-img' alt="" /></NavLink >
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" className='shadow-none ' />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
           </Nav>
           <Nav>
+
             {userRole === "civilian" && (
               <>
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/civilian-dashboard">Explore</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/civilian-dashboard">Explore</NavLink >
               </>
             )}
             {userRole === "Admin" && (
               <>
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/register-police">Register Police</NavLink >
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Home</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/register-police">Register Police</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/dashboard">Home</NavLink >
               </>
             )}
             {userRole === "Inspector" && (
               <>
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/inspector-Dashboard">Explore</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/inspector-Dashboard">Explore</NavLink >
               </>
             )}
             {userRole === "Sub-Inspector" && (
               <>
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/dashboard">Explore</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/dashboard">Explore</NavLink >
               </>
             )}
 
@@ -73,13 +75,13 @@ function MyNavbar() {
             {isLogged ? (
               <>
                 {/* <NavLink className='mx-2 text-decoration-none nav-link ' to='/MostWanted'>MostWanted</NavLink > */}
-                <NavLink className='mx-2 text-decoration-none nav-link ' onClick={handleLogout}>Logout</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt ' onClick={handleLogout}>Logout</NavLink >
               </>
             ) : (
               <>
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/">Explore</NavLink >
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/register">Register</NavLink >
-                <NavLink className='mx-2 text-decoration-none nav-link' to="/login">Login</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/">Explore</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/register">Register</NavLink >
+                <NavLink className='mx-2 text-decoration-none nav-link nav-txt' to="/login">Login</NavLink >
               </>
             )}
             {/* <img src={`http://localhost:3001/images/${data.image}`}

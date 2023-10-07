@@ -36,7 +36,7 @@ const Login = () => {
             localStorage.setItem('role', result.data.user.role);         
             // Dispatch action to update Redux store
             dispatch(setUserEmail(result.data.user));
-            history('/dashboard');
+            history('/');
             window.location.reload();
           })
           .catch((error) => {
@@ -54,7 +54,7 @@ const Login = () => {
   return (
     <div>
       <div className="justify-content-center ">
-        <div className="wrapper row col-6 mx-auto">
+        <div className="wrapper row col-md-6 mx-auto">
           <h2>Login</h2>
           <form onSubmit={loginValidate}>
             <div className="input-box">

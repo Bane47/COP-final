@@ -32,6 +32,8 @@ const ComplainantForm = () => {
         inspector: ''
     });
     var complaintCode;
+    const [image, setImage] = useState();
+   
     const [zones, setZones] = useState([]);
     const [crimeTypes, setCrimeTypes] = useState([]);
 
@@ -56,8 +58,33 @@ const ComplainantForm = () => {
         return () => clearTimeout(timeout);
     }, []);
 
+    const handleImageUpload = (event) => {
+        const selectedFile = event.target.files[0];
+    
+        if (selectedFile) {
+          convertImageToBase64(selectedFile, (data) => {
+            setImage(data);
+            console.log('Base64 data:', data);
+            // You can use the base64Data state here as needed (e.g., send it to a server, display it, etc.)
+          });
+        }
+      };
+
+      const convertImageToBase64 = (imageFile, callback) => {
+        const reader = new FileReader();
+    
+        // Set up a callback function to handle the file reading
+        reader.onload = () => {
+          const base64Data = reader.result.split(',')[1]; // Extract the base64 data from the result
+          callback(base64Data);
+        };
+    
+        // Read the image file as a Data URL
+        reader.readAsDataURL(imageFile);
+      };
+
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const complainantData = { ...formData };
         generateCode(formData.incidentLocation, formData.stationCode)
@@ -69,16 +96,14 @@ const ComplainantForm = () => {
         const hours = reportTime.getHours();
         const minutes = reportTime.getMinutes();
 
-        const dateOnly = new Date(year, month - 1, day);
-
-        axios.post('http://localhost:3001/post-crimes', {
+        await axios.post('http://localhost:3001/post-crimes', {
             crimeType: formData.crimeType,
             complaintDescription: formData.complaintDescription,
             incidentDate: formData.incidentDate,
             incidentLocation: formData.incidentLocation,
             stationCode: formData.stationCode,
             incidentDescription: formData.incidentDescription,
-            evidenceFile: formData.evidenceFile,
+            evidenceFile: image,
             witnessStatement: formData.witnessStatement,
             witnessContact: formData.witnessContact,
             witnessAddress: formData.witnessAddress,
@@ -95,7 +120,7 @@ const ComplainantForm = () => {
         })
             .then(() => {
                 setShowModal(true);
-                setComplaintCode(complaintCode);                
+                setComplaintCode(complaintCode);
             })
             .catch((error) => {
                 console.log(error)
@@ -134,26 +159,27 @@ const ComplainantForm = () => {
         } else if (field === 'incidentDate') {
             const currentDate = new Date(); // Get the current date
             const selectedDate = new Date(value); // Convert the entered date to a Date object
-        
+
             // Check if the selected date is in the future
             if (selectedDate > currentDate) {
-              // You can display an error message or handle the validation as needed
-              alert('Future date not allowed');
+                // You can display an error message or handle the validation as needed
+                alert('Future date not allowed');
             } else {
-              // Update the form data when it's a valid date
-              setFormData({
-                ...formData,
-                [field]: value,
-              });
+                // Update the form data when it's a valid date
+                setFormData({
+                    ...formData,
+                    [field]: value,
+                });
             }
-          } else {
+        } else {
             // For other fields, update the form data as usual
             setFormData({
-              ...formData,
-              [field]: value,
+                ...formData,
+                [field]: value,
             });
-          }
-        };
+        }
+    };
+ 
 
 
     return (
@@ -179,169 +205,197 @@ const ComplainantForm = () => {
 
                 <div className='mt-5'>
                     <div className='mt-5'>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit} >
                             {step === 1 && (
                                 <>
                                     <h2>Crime Description</h2>
-                                    <div className='row my-2 mt-4'>
-                                        <label htmlFor="complaintDescription" className='col-4 text-end'>Crime Type:</label>
-                                        <div className='col-6 text-end'>
-                                            <Form.Select aria-label="Default select example"
-                                                value={formData.crimeType}
-                                                onChange={(e) => updateFormData('crimeType', e.target.value)}>
-                                                <option >Select the crime type</option>
-                                                {crimeTypes && (
-                                                    <>
-                                                        {crimeTypes.map((data) => (
-                                                            <option key={data._id} value={data.crimeType}>
-                                                                {data.crimeType}
-                                                            </option>
-                                                        ))}
-                                                    </>
-                                                )}
-                                                <option value="other">Other</option>
+                                    <div className='row my-2 mt-4 justify-content-center'>
+                                        <div className='col-md-8'>
+                                            <div className="card p-5">
+                                                <div className="row d-flex flex-row align-items-center justify-content-center">
+                                                    <div className="col-md-4 text-start">
+                                                        <label htmlFor="complaintDescription">Crime Type:</label>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <Form.Select aria-label="Default select example" className='w-100 shadow-none shadow-none mt-1'
+                                                            value={formData.crimeType}
+                                                            onChange={(e) => updateFormData('crimeType', e.target.value)}>
+                                                            <option >Select the crime type</option>
+                                                            {crimeTypes && (
+                                                                <>
+                                                                    {crimeTypes.map((data) => (
+                                                                        <option key={data._id} value={data.crimeType}>
+                                                                            {data.crimeType}
+                                                                        </option>
+                                                                    ))}
+                                                                </>
+                                                            )}
+                                                            <option value="other">Other</option>
 
-                                            </Form.Select>
+                                                        </Form.Select>
+                                                    </div>
+                                                </div>
 
-                                        </div>
-                                        <label htmlFor="complaintDescription" className='col-4 text-end mt-2'>Complaint Description:</label>
-                                        <div className='col-6 text-center mt-2'>
-                                            <InputTextarea
-                                                className='col-5'
-                                                id="complaintDescription"
-                                                value={formData.complaintDescription}
-                                                onChange={(e) => updateFormData('complaintDescription', e.target.value)}
-                                                required
-                                            ></InputTextarea>
+
+                                                <div className="row d-flex align-items-center justify-content-center">
+                                                    <div className="col-md-4 text-start">
+                                                        <label htmlFor="complaintDescription" className='mt-2'>Complaint Description:</label></div>
+
+                                                    <div className='col-md-6 mt-2'>
+                                                        <InputTextarea
+                                                            className='w-100 shadow-none shadow-none'
+                                                            id="complaintDescription"
+                                                            value={formData.complaintDescription}
+                                                            onChange={(e) => updateFormData('complaintDescription', e.target.value)}
+                                                            required
+                                                        ></InputTextarea>
+                                                    </div></div> <div className='row'>
+
+                                                    <div className='col-12 mt-3'>
+                                                        <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                        </div>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
-                                        </div>
-                                    </div>
+
                                 </>
                             )}
 
                             {step === 2 && (
                                 <>
                                     <h2>Incident Details</h2>
-                                    <div className='row my-2 mt-4'>
-                                        <label htmlFor="incidentDate" className='col-4 text-end'>Incident Date:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputText
-                                                type="date"
-                                                id="incidentDate"
-                                                variant="outlined"
-                                                value={formData.incidentDate}
-                                                onChange={(e) => updateFormData('incidentDate', e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="incidentLocation" className='col-4 text-end'>Incident Location:</label>
-                                        <div className='col-6 text-center'>
-                                            <Form.Select
-                                                aria-label="Default select example"
-                                                id="incidentLocation"
-                                                value={formData.incidentLocation}
-                                                onChange={(e) => updateFormData('incidentLocation', e.target.value)}
-                                                required
-                                            >
-                                                <option>Select the area</option>
-                                                {zones && zones.map((data) => (
-                                                    <option key={data._id} value={data.area}>
-                                                        {data.area}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
+                                    <div className='row justify-content-center'>
+                                        <div className="col-md-8">
+                                            <div className="card p-5">
+                                                <div className='row my-2 mt-4'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="incidentDate">Incident Date:</label>  </div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputText
+                                                            type="date" className='w-100 shadow-none'
+                                                            id="incidentDate"
+                                                            variant="outlined"
+                                                            value={formData.incidentDate}
+                                                            onChange={(e) => updateFormData('incidentDate', e.target.value)}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="incidentLocation">Incident Location:</label>  </div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <Form.Select
+                                                            aria-label="Default select example"
+                                                            id="incidentLocation"
+                                                            className='shadow-none'
+                                                            value={formData.incidentLocation}
+                                                            onChange={(e) => updateFormData('incidentLocation', e.target.value)}
+                                                            required
+                                                        >
+                                                            <option>Select the area</option>
+                                                            {zones && zones.map((data) => (
+                                                                <option key={data._id} value={data.area}>
+                                                                    {data.area}
+                                                                </option>
+                                                            ))}
+                                                        </Form.Select>
 
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="incidentDescription" className='col-4 text-end'>Incident Description:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputTextarea autoResize
-                                                id="incidentDescription"
-                                                value={formData.incidentDescription}
-                                                onChange={(e) => updateFormData('incidentDescription', e.target.value)}
-                                                required
-                                            ></InputTextarea>
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
-                                        </div>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
-                                        </div>
-                                    </div>
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="incidentDescription">Incident Description:</label>  </div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputTextarea autoResize
+                                                            id="incidentDescription" className='w-100 shadow-none'
+                                                            value={formData.incidentDescription}
+                                                            onChange={(e) => updateFormData('incidentDescription', e.target.value)}
+                                                            required
+                                                        ></InputTextarea>
+                                                    </div>
+                                                </div>
+                                                <div className='row mt-3'>
+                                                    <div className='col-6'>
+                                                        <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
+                                                    </div>
+                                                </div>
+                                            </div></div></div>
                                 </>
                             )}
 
                             {step === 3 && (
                                 <>
                                     <h2>Witness Information - Optional</h2>
-                                    <div className='row my-2 mt-4'>
-                                        <label htmlFor="witnessName" className='col-4 text-end'>Witness Name:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputText
-                                                type="text"
-                                                id="witnessName"
-                                                value={formData.witnessName}
-                                                onChange={(e) => updateFormData('witnessName', e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="witnessContact" className='col-4 text-end'>Witness Contact Number:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputText
-                                                type="tel"
-                                                id="witnessContact"
-                                                value={formData.witnessContact}
-                                                onChange={(e) => updateFormData('witnessContact', e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="witnessAddress" className='col-4 text-end'>Witness Address:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputTextarea autoResize
-                                                className='col-5'
-                                                id="witnessAddress"
-                                                value={formData.witnessAddress}
-                                                onChange={(e) => updateFormData('witnessAddress', e.target.value)}
-                                                required
-                                            ></InputTextarea>
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="witnessStatement" className='col-4 text-end'>Witness Statement:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputTextarea
-                                                className='col-5'
-                                                id="witnessStatement"
-                                                value={formData.witnessStatement}
-                                                onChange={(e) => updateFormData('witnessStatement', e.target.value)}
-                                                required
-                                            ></InputTextarea>
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
-                                        </div>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
-                                        </div>
-                                    </div>
+                                    <div className='row justify-content-center'>
+                                        <div className="col-md-8">
+                                            <div className="card p-5">
+                                                <div className='row my-2 mt-4 align-items-center'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="witnessName" >Witness Name:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputText
+                                                            type="text"
+                                                            className='w-100 shadow-none'
+                                                            id="witnessName"
+                                                            value={formData.witnessName}
+                                                            onChange={(e) => updateFormData('witnessName', e.target.value)}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className='col-md-6 text-start'>
+                                                        <label htmlFor="witnessContact" >Witness Contact Number:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputText
+                                                            type="tel"
+                                                            className='w-100 shadow-none'
+                                                            id="witnessContact"
+                                                            value={formData.witnessContact}
+                                                            onChange={(e) => updateFormData('witnessContact', e.target.value)}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className='col-md-6 text-start'>
+                                                        <label htmlFor="witnessAddress" >Witness Address:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputTextarea autoResize
+                                                            className='w-100 shadow-none'
+                                                            id="witnessAddress"
+                                                            value={formData.witnessAddress}
+                                                            onChange={(e) => updateFormData('witnessAddress', e.target.value)}
+                                                            required
+                                                        ></InputTextarea>
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className='col-md-6 text-start'>
+                                                        <label htmlFor="witnessStatement" >Witness Statement:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputTextarea
+                                                            className='w-100 shadow-none'
+                                                            id="witnessStatement"
+                                                            value={formData.witnessStatement}
+                                                            onChange={(e) => updateFormData('witnessStatement', e.target.value)}
+                                                            required
+                                                        ></InputTextarea>
+                                                    </div>
+                                                </div>
+                                                <div className='row'>
+                                                    <div className='col-6'>
+                                                        <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <button type="button" onClick={handleNext} className='btn btn-primary'>Next</button>
+                                                    </div>
+                                                </div> </div> </div> </div>
                                 </>
                             )}
 
@@ -349,38 +403,44 @@ const ComplainantForm = () => {
                             {step === 4 && (
                                 <>
                                     <h2>Additional Details & Evidence</h2>
-                                    <div className='row my-2 mt-4'>
-                                        <label htmlFor="additionalDetails" className='col-4 text-end'>Additional Details:</label>
-                                        <div className='col-6 text-center'>
-                                            <InputTextarea
-                                                className='col-5'
-                                                id="additionalDetails"
-                                                value={formData.additionalDetails}
-                                                onChange={(e) => updateFormData('additionalDetails', e.target.value)}
-                                                required
-                                            ></InputTextarea>
-                                        </div>
-                                    </div>
-                                    <div className='row my-2'>
-                                        <label htmlFor="evidence" className='col-4 text-end'>Evidence:</label>
-                                        <div className='col-6 text-center'>
-                                            <input
-                                                type="file"
-                                                id="evidence"
-                                                value={formData.evidenceFile}
-                                                onChange={(e) => updateFormData('evidenceFile', e.target.value)}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className='row'>
-                                        <div className='col-6'>
-                                            <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
-                                        </div>
-                                        <div className='col-6'>
-                                            <button type="submit" className='btn btn-primary'>Submit</button>
-                                        </div>
-                                    </div>
+                                    <div className='row justify-content-center'>
+                                        <div className="col-md-8">
+                                            <div className="card p-5">
+                                                <div className='row my-2 mt-4 align-items-center'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="additionalDetails" >Additional Details:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <InputTextarea
+                                                            className='w-100 shadow-none'
+                                                            id="additionalDetails"
+                                                            value={formData.additionalDetails}
+                                                            onChange={(e) => updateFormData('additionalDetails', e.target.value)}
+                                                            required
+                                                        ></InputTextarea>
+                                                    </div>
+                                                </div>
+                                                <div className='row my-2 align-items-center'>
+                                                    <div className="col-md-6 text-start">
+                                                        <label htmlFor="evidence" >Evidence:</label></div>
+                                                    <div className='col-md-6 text-start'>
+                                                        <input
+                                                            className='w-100 shadow-none'
+                                                            type="file"
+                                                            id="evidence"
+                                                            name="evidenceFile"
+                                                            onChange={handleImageUpload} 
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='row mt-3'>
+                                                    <div className='col-6'>
+                                                        <button type="button" onClick={handlePrev} className='btn btn-secondary'>Previous</button>
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <button type="submit" className='btn btn-primary'>Submit</button>
+                                                    </div>
+                                                </div> </div> </div> </div>
                                 </>
                             )}
 
@@ -390,7 +450,7 @@ const ComplainantForm = () => {
                     {showModal && (
                         <ComplaintCodeModal
                             show={showModal}
-                            onHide={() => {setShowModal(false);history('/civilian-dashboard');}} // Function to hide the modal
+                            onHide={() => { setShowModal(false); history('/civilian-dashboard'); }} // Function to hide the modal
                             complaintCode={compCode}
                         />
                     )}

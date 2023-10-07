@@ -20,7 +20,6 @@ import ProgressUpdateForm from '../Form/ProgressUpdateForm';
 
 
 const FIR = () => {
-    const officer = localStorage.getItem('userName');
     const [selectedRow, setSelectedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reportData, setReportData] = useState([]);
@@ -28,7 +27,6 @@ const FIR = () => {
     const [rowData, setRowData] = useState({});
     const officerEmail = localStorage.getItem('userName');
     const [secondDialogOpen, setSecondDialogOpen] = useState(false);
-    var firCode;
 
     const openSecondDialog = () => {
         setSecondDialogOpen(true);
@@ -51,6 +49,7 @@ const FIR = () => {
 
     const openDialog = (row) => {
         setDialogOpen(true);
+        console.log(row)
         setRowData(row)
     };
 
@@ -93,11 +92,7 @@ const FIR = () => {
                         setReportData(response.data);
                         console.log(response.data)
                     })
-            })
-            // axios.get(`http://localhost:3001/registered-firs/${stationCode}`)
-            //     .then((response) => {
-            //         setReportData(response.data);
-            //     })
+            })  
             .catch((error) => {
                 console.log(error)
             });
@@ -108,6 +103,8 @@ const FIR = () => {
     }, [])
     return (
         <div>
+            <h2>First-Information-Reports</h2>
+
             <div className="container-fluid mt-5">
                 <div className="row" id="table-main">
                     <div className="col-12">
@@ -130,7 +127,7 @@ const FIR = () => {
                                 enableEditing
                                 renderRowActions={({ row, table }) => (
                                     <Box sx={{ display: 'flex', gap: '1rem' }}>
-                                        <Tooltip arrow placement="left" title="View">
+                                        <Tooltip arrow placement="right" title="View">
                                             <IconButton onClick={() => openDialog(row.original)}>
                                                 <FontAwesomeIcon icon={faSearch} className="fa-magnifying-glass" />
                                             </IconButton>
@@ -149,6 +146,7 @@ const FIR = () => {
                     {rowData && (
                         <ul className='list-unstyled p-2'>
                             <li className='text-center'><b>Complaint Details</b></li>
+                            <li><b>FIR No</b>: {rowData.firCode}</li>
                             <li><b>Crime Type</b>: {rowData.crimeType}</li>
                             <li><b>Complaint Description</b>: {rowData.complaintDescription}</li>
                             <li><b>Date</b>: {rowData.incidentDate}</li>
@@ -187,14 +185,14 @@ const FIR = () => {
                     </Button>
                     <Button onClick={openSecondDialog} color="primary">
                         Send Update
-                    </Button>                    
+                    </Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={secondDialogOpen} onClose={closeSecondDialog}>
                 <DialogTitle>Second Dialog</DialogTitle>
                 <DialogContent>
-                <ProgressUpdateForm email={rowData.userEmail} name={rowData.userName} onSubmit={(formData) => {
+                    <ProgressUpdateForm email={rowData.userEmail} firCode={rowData.firCode} compCode={rowData.complaintCode} name={rowData.userName} onSubmit={(formData) => {
                         // Handle the submission of progress update data here
                         console.log(formData);
                     }} />

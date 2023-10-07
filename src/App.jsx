@@ -22,6 +22,8 @@ import InspectorDashboard from './components/Dashboard/InspectorDashboard';
 import HomeDashboard from './components/Dashboard/HomeDashboard';
 import InspectorComplaints from './components/Inspector/InspectorComplaints';
 import FIR from './components/Inspector/FIR';
+import SmallNav from './components/navbar/SmallNav';
+import Officers from './components/Officers/Officers';
 
 
 
@@ -37,13 +39,13 @@ function App() {
         <MyNavbar />
         <div className="container mt-3">
           <div className='row' id='main-app'>
-            <div className='col-3'>
-              <Sidebar />
-            </div>
-            <div className='col-9 mt-5'>
+            
+            <div className='col-12 mt-5'>
+              <SmallNav></SmallNav>
               {isLogged ? (
               <>
                   <Routes>
+
                     <Route path='/' element={<HomeDashboard />} />
                     {role === "Admin" && reduxRole === 'Admin' && (
                       <>
@@ -54,6 +56,7 @@ function App() {
                         <Route path='/dashboard' element={<OfficerDashboard />} />
                         <Route path='/MostWanted' element={<MostWanted />} />
                         <Route path='/updates' element={<MostWanted />} />
+                        <Route path='/officers-page' element={<Officers />} />
 
                       </>
                     )}

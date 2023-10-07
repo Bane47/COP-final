@@ -26,9 +26,13 @@ const Reports = () => {
     const [reportData, setReportData] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [rowData, setRowData] = useState({});
-    const [formData,setFormData] = useState();
-    const [secondDialogOpen,setSecondDialogOpen]=useState(false);
-
+    const [formData, setFormData] = useState();
+    const [secondDialogOpen, setSecondDialogOpen] = useState(false);
+    const [image, setImage] = useState();
+    const handleImageChange = (e) => {
+        setImage(e.target.files[0]);
+        console.log(e.target.files[0])
+    };
 
 
     const handleRowClick = (row) => {
@@ -43,20 +47,21 @@ const Reports = () => {
 
     const openDialog = (row) => {
         setDialogOpen(true);
-        setRowData(row)
+        setRowData(row);
     };
 
     const closeDialog = () => {
         setDialogOpen(false);
     };
-    const openSecondDialog = () => {
+    const openSecondDialog = (row) => {
         setSecondDialogOpen(true);
     };
 
     const closeSecondDialog = () => {
         setSecondDialogOpen(false);
-    };
+        setFormData('')
 
+    };
 
 
 
@@ -85,13 +90,15 @@ const Reports = () => {
     );
 
     const investigateCrime = (row) => {
+        const formData = new FormData(); // Use capital "D"
+        formData.append('image', image);
         const crimeType = row.crimeType;
         const complaintDescription = row.complaintDescription;
         const incidentDate = row.incidentDate;
         const incidentLocation = row.incidentLocation;
         const stationCode = row.stationCode;
         const incidentDescription = row.incidentDescription;
-        const evidenceFile = row.evidenceFile;
+        const evidenceFile = formData.image;
         const witnessStatement = row.witnessStatement;
         const witnessContact = row.witnessContact;
         const witnessAddress = row.witnessAddress;
@@ -131,18 +138,17 @@ const Reports = () => {
             inspector,
             firRegisteredAt,
         })
-            // .then(() => {
-            //     axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
-            //     .then(()=>{
-            //         alert("Complaint sent to the Police station");
-            //     })
-            //         .catch((err) => {
-            //             console.log(err);
-            //         })
-            // })
             .then(() => {
-                alert("Report sent to the police station")
+                axios.delete(`http://localhost:3001/delete-crime/${row._id}`)
+                .then(()=>{
+                    alert("Complaint sent to the Police station");
+                    window.location.reload();
+                })
+                    .catch((err) => {
+                        console.log(err);
+                    })
             })
+            
             .catch((error) => {
                 console.error(error);
             });
@@ -210,7 +216,7 @@ const Reports = () => {
         axios.delete(`http://localhost:3001/decline-fir/${row._id}`)
             .then((response) => {
                 alert("Crime report is declined ", row._id);
-                window.location.reload();
+                
             })
             .catch((error) => {
                 console.error(error);
@@ -224,18 +230,17 @@ const Reports = () => {
 
 
 
-    const fetchData = async() => {
+
+
+    const fetchData = async () => {
         axios.get('http://localhost:3001/get-crimes')
             .then((response) => {
                 setReportData(response.data)
+                console.log(response.data)
             })
-
-        try {
-            const response = await axios.get('http://localhost:3001/progress-updates');
-            setFormData(response.data[0]);
-        } catch (error) {
-            console.error(error);
-        }
+            .catch((error) => {
+                console.log(error);
+            })
 
     }
 
@@ -247,6 +252,7 @@ const Reports = () => {
 
     return (
         <div>
+            <h2>Un-Registered Reports</h2>
             <div className="container-fluid mt-5">
                 <div className="row" id="table-main">
                     <div className="col-12">
@@ -276,7 +282,7 @@ const Reports = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip arrow placement="left" title="Updates">
-                                            <IconButton onClick={() => openSecondDialog()}>
+                                            <IconButton onClick={() => openSecondDialog(row.original)}>
                                                 <FontAwesomeIcon icon={faEdit} className="fa-edit" />
                                             </IconButton>
                                         </Tooltip>
@@ -300,9 +306,7 @@ const Reports = () => {
                             <li><b>Location</b>: {rowData.incidentLocation}</li>
                             <li><b>Incident Description</b>: {rowData.incidentDescription}</li>
                             <li><b>Station Code</b>: {rowData.stationCode}</li>
-                            <li><b>Evidence</b>: {rowData.evidenceFile}</li>
                             <li><b>Additional Details</b>:{rowData.additionalDetails}</li>
-
                             {!rowData.witnessName ? (
                                 <>
                                     <li className='text-center my-1'><b>Witness Details</b></li>
@@ -315,6 +319,14 @@ const Reports = () => {
                                     <li><b>WitnessContact</b>:{rowData.witnessContact}</li>
                                     <li><b>WitnessAddress</b>:{rowData.witnessAddress}</li>
                                 </>
+                            )}
+                            {rowData.evidenceFile && (
+                                <img
+                                    src={`data:image/jpeg;base64,${rowData.evidenceFile}`}
+                                    alt="Evidence"
+                                    
+                                />
+
                             )}
                             <li className='text-center my-1'><b>Complainant Details</b></li>
                             <li><b>Email</b>: {rowData.userEmail}</li>
@@ -339,34 +351,7 @@ const Reports = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={secondDialogOpen} onClose={closeSecondDialog}>
-                <DialogTitle>Update</DialogTitle>
-                <DialogContent>
-                    <DialogContent>
-                        <ul className='list-unstyled p-2'>
-                            <li className='text-center'><b>Complaint Status Update</b></li>
-                            {formData ? (
-                                <>{console.log(formData)}
-                                    <li><b>Progress</b>: {formData.progress}</li>
-                                    <li><b>Status</b>: {formData.status}</li>
-                                    <li><b>Officer Name</b>: {formData.officerName}</li>
-                                    <li><b>Complainant Email</b>: {formData.email}</li>
-                                    <li><b>Name</b>: {formData.name}</li>
-                                    <li><b>Officer Number</b>: {formData.officerNumber}</li>
-                                </>
-                            ) : (
-                                <li className='text-center'>No updates yet</li>
-                            )}
-                        </ul>
-                    </DialogContent>
-
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={closeSecondDialog} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            
         </div>
     );
 };

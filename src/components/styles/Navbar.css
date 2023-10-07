@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 body {
     width: 100%;
@@ -5,14 +6,30 @@ body {
     margin: 0px;
     padding: 0px;
     overflow-x: hidden;
-    background-color: white !important;
+    background-color: #F0F5F9 !important;
+    font-family: 'Roboto', sans-serif !important;
+    color: #34373b !important;
+    /* #eb493a;#f3f5f8 */
 }
 
 .nav-item {
     color: white !important;
     font-weight: bolder;
     font-size: larger;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ 
+}
+.logo-img{
+    height: 50px;
+    width: 50px;
+}
+
+.navbar-color {
+    background-color:#bfc7d1;
+    color: #34373b !important;
+}
+.nav-txt{
+    color: #34373b !important;
+    font-family:  'Roboto', sans-serif;
 }
 
 .nav-item:hover {
@@ -146,6 +163,9 @@ body {
     .nav-item {
         color: #E95619 !important;
 
+    }
+    .nav-txt{
+        color:#43A49B !important;
     }
 
     .nav-item:hover {

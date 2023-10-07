@@ -18,7 +18,7 @@ import {
 import { Delete, Edit } from '@mui/icons-material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faProductHunt } from '@fortawesome/free-brands-svg-icons';
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faPenNib, faSearch } from '@fortawesome/free-solid-svg-icons';
 import RowDetailsModal from '../model/TableModel';
 
 
@@ -27,6 +27,13 @@ const RegisteredFirs = () => {
     const officer = localStorage.getItem('userName');
     const [selectedRow, setSelectedRow] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rowData, setRowData] = useState({});
+    const [formData, setFormData] = useState();
+    const [secondDialogOpen, setSecondDialogOpen] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+
+
 
     const handleRowClick = (row) => {
         setSelectedRow(row);
@@ -36,6 +43,26 @@ const RegisteredFirs = () => {
     const closeModal = () => {
         setSelectedRow(null);
         setIsModalOpen(false);
+    };
+
+
+    const openDialog = (row) => {
+        setDialogOpen(true);
+        setRowData(row);
+    };
+
+    const closeDialog = () => {
+        setDialogOpen(false);
+    };
+    const openSecondDialog = (row) => {
+        setSecondDialogOpen(true);
+        updateFetch(row)
+    };
+
+    const closeSecondDialog = () => {
+        setSecondDialogOpen(false);
+        setFormData('')
+
     };
 
 
@@ -57,11 +84,6 @@ const RegisteredFirs = () => {
                 size: 150,
             },
             {
-                accessorKey: 'contact',
-                header: 'Contact',
-                size: 150,
-            },
-            {
                 accessorKey: 'incidentDate',
                 header: 'Date',
                 size: 100,
@@ -69,16 +91,6 @@ const RegisteredFirs = () => {
             {
                 accessorKey: 'inspector',
                 header: 'Assigned Officer',
-                size: 100,
-            },
-            {
-                accessorKey: 'userName',
-                header: 'Complainant Name',
-                size: 100,
-            },
-            {
-                accessorKey: 'reportedAt',
-                header: 'Reported Date',
                 size: 100,
             }
         ],
@@ -152,7 +164,7 @@ const RegisteredFirs = () => {
             status: "Solved",
             complaintCode,
             inspector,
-            firRegisteredAt:`Date: ${dateOnly} , Time: ${hours}:${minutes}`,
+            firRegisteredAt: `Date: ${dateOnly} , Time: ${hours}:${minutes}`,
         })
             .then(() => {
                 alert('First-Information-Report filed!')
@@ -204,13 +216,13 @@ const RegisteredFirs = () => {
         const day = firRegisteredAt.getDate();
         const hours = firRegisteredAt.getHours();
         const minutes = firRegisteredAt.getMinutes();
-       
+
 
         const dateOnly = new Date(year, month - 1, day);
-        setRegistrationTime(hours+":"+minutes);
+        setRegistrationTime(hours + ":" + minutes);
 
 
-        axios.put(`http://localhost:3001/pending-fir/${row._id}`, { 
+        axios.put(`http://localhost:3001/pending-fir/${row._id}`, {
             crimeType,
             complaintDescription,
             incidentDate,
@@ -228,21 +240,67 @@ const RegisteredFirs = () => {
             userName,
             reportedAt,
             reportedTime,
-            status:"Pending",
+            status: "Pending",
             complaintCode,
             inspector,
-            firRegisteredAt:`Date: ${dateOnly} , Time: ${hours}:${minutes}`,          
-            })
+            firRegisteredAt: `Date: ${dateOnly} , Time: ${hours}:${minutes}`,
+        })
             .then((response) => {
                 alert('Complaint added to the pending list');
             }).catch((error) => {
                 console.log(error);
             })
 
+        const updatedData = reportData.filter((item) => item._id !== row._id);
+        setReportData(updatedData);
+        closeDialog();
+
     };
+
+    const updateFetch = async (row) => {
+        try {
+
+            const response = await axios.get('http://localhost:3001/progress-updates')
+                .then((response) => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        if (response.data[i].compCode === row.complaintCode) {
+                            setFormData(response.data[i]);
+                        }
+                    }
+                })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+
+
+
+
+    const sendEmail = async (row) => {
+        try {
+            axios.post('http://localhost:3001/update-mail', {
+                email: row.email,
+                progress: row.progress,
+                status: row.status,
+                officerName: row.officerName,
+                name: row.name,
+                complaintCode: row.compCode
+            })
+                .then(() => {
+                    alert("Email sent!");
+                    window.location.reload();
+                })
+        } catch (err) {
+            alert("Could not send the email!")
+            console.log(err);
+        }
+    }
 
     return (
         <div className="mt-5">
+            <h2>First-Information-Report</h2>
             <div className="container-fluid mt-5">
                 <div className="row" id='table-main'>
                     <div className='col-12'>
@@ -264,21 +322,108 @@ const RegisteredFirs = () => {
                                 renderRowActions={({ row, table }) => (
                                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                                         {console.log(row.original)}
-                                        <Tooltip arrow placement="left" title="Investigate">
-                                            <IconButton color='primary' onClick={() => fileFIR(row.original)}>
-                                                <FontAwesomeIcon icon={faCircleCheck} />
+                                        <Tooltip arrow placement="left" title="Update">
+                                            <IconButton color='primary' onClick={() => openDialog(row.original)}>
+                                            <FontAwesomeIcon icon={faSearch} className="fa-magnifying-glass" />
                                             </IconButton>
                                         </Tooltip>
-                                        <Tooltip arrow placement="right" title="Decline">
-                                            <IconButton color="error" onClick={() => handlePending(row.original)}>
-                                                <FontAwesomeIcon icon={faProductHunt} />
+                                        <Tooltip arrow placement="right" title="Updates">
+                                            <IconButton color="success" onClick={() => openSecondDialog(row.original)}>
+                                                <FontAwesomeIcon icon={faPenNib} />
                                             </IconButton>
                                         </Tooltip>
                                     </Box>
                                 )}
                             />                        </div>
                     </div>
-                    <RowDetailsModal selectedRow={selectedRow} onClose={closeModal} />
+
+                    <Dialog open={dialogOpen} onClose={closeDialog}>
+                        <DialogTitle>Investigate Crime</DialogTitle>
+                        <DialogContent>
+                            {rowData && (
+                                <ul className='list-unstyled p-2'>
+                                    <li className='text-center'><b>Complaint Details</b></li>
+                                    <li><b>Crime Type</b>: {rowData.crimeType}</li>
+                                    <li><b>Complaint Description</b>: {rowData.complaintDescription}</li>
+                                    <li><b>Date</b>: {rowData.incidentDate}</li>
+                                    <li><b>Location</b>: {rowData.incidentLocation}</li>
+                                    <li><b>Incident Description</b>: {rowData.incidentDescription}</li>
+                                    <li><b>Station Code</b>: {rowData.stationCode}</li>
+                                    <li><b>Additional Details</b>:{rowData.additionalDetails}</li>
+                                    {!rowData.witnessName ? (
+                                        <>
+                                            <li className='text-center my-1'><b>Witness Details</b></li>
+                                            <li><b>Witness</b>: None</li>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <li><b>Witness Details</b></li>
+                                            <li><b>WitnessName</b>:{rowData.witnessName}</li>
+                                            <li><b>WitnessContact</b>:{rowData.witnessContact}</li>
+                                            <li><b>WitnessAddress</b>:{rowData.witnessAddress}</li>
+                                        </>
+                                    )}
+                                    {rowData.evidenceFile && (
+                                        <img
+                                            src={`data:image/jpeg;base64,${rowData.evidenceFile}`}
+                                            alt="Evidence"
+
+                                        />
+
+                                    )}
+                                    <li className='text-center my-1'><b>Complainant Details</b></li>
+                                    <li><b>Email</b>: {rowData.userEmail}</li>
+                                    <li><b>Name</b>: {rowData.userName}</li>
+                                    <li><b>Contact</b>:{rowData.contact}</li>
+                                    <li><b>Reported at</b>: {rowData.reportedAt}</li>
+                                    <li><b>Time</b>: {rowData.reportedTime}</li>
+                                    <li><b>Complaint Code</b>: {rowData.complaintCode}</li>
+                                </ul>
+                            )}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={closeDialog} color="primary">
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                    <Dialog open={secondDialogOpen} onClose={closeSecondDialog}>
+                        <DialogTitle>Update</DialogTitle>
+                        <DialogContent>
+                            <DialogContent>
+                                <ul className='list-unstyled p-2'>
+                                    <li className='text-center'><b>Complaint Status Update</b></li>
+                                    {formData ? (
+                                        <>
+                                            <li><b>Progress</b>: {formData.progress}</li>
+                                            <li><b>Status</b>: {formData.status}</li>
+                                            <li><b>Officer Name</b>: {formData.officerName}</li>
+                                            <li><b>Complainant Email</b>: {formData.email}</li>
+                                            <li><b>Name</b>: {formData.name}</li>
+                                            <li><b>Officer Number</b>: {formData.officerNumber}</li>
+                                            <li><b>FIR No</b>: {formData.firCode}</li>
+                                            <li><b>Complaint Code</b>: {formData.compCode}</li>
+                                        </>
+                                    ) : (
+                                        <li className='text-center'>No updates yet</li>
+                                    )}
+                                </ul>
+                            </DialogContent>
+
+                        </DialogContent>
+                        <DialogActions>
+
+                            {formData && (
+                                <Button color="primary" onClick={() => sendEmail(formData)}>
+                                    Send Email
+                                </Button>
+                            )}
+                            <Button onClick={closeSecondDialog} color="primary">
+                                Close
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
                 </div>
             </div>

@@ -1,0 +1,10 @@
+.badge-counter {
+    border-radius: 50%;
+    background-color: red;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: bold;
+  }
